@@ -16,12 +16,12 @@ About
   from trying to write to the database during the attack (to prevent them from
   getting white screens or getting frustrated when their data doesn't save).
 
-  By itself, this module doesn't do anything. It just sets a
-  variable to keep track of whether the shunt is enabled, lets modules check if
-  the shunt is enabled, and provides hooks to let modules react to shunts being enabled/disabled.
+  By itself, this module doesn't do anything. It just keeps track of whether the shunt 
+  is enabled, lets modules check if the shunt is enabled, and provides hooks to let
+  modules react to shunts being enabled/disabled.
 
-  Note: the primary function of this module is to degrade features gracefully
-  without requiring any cache clears.
+  Note: For implementing modules to effectively degrade features gracefully,
+  they should not require cache clears.
 
 
 Usage
