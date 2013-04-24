@@ -60,3 +60,10 @@ Usage
         admin/config/system/shunt
 
         Disable shunt check box. Save.
+
+
+Developers
+----------
+
+  For instructions and examples on how to shunt-enable a module, see
+  shunt.api.php.
