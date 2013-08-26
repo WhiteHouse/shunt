@@ -83,22 +83,38 @@ function shunt_drush_command() {
  * @see drush_invoke()
  * @see drush.api.php
  */
-function drush_shunt_enable($name = NULL){
+function drush_shunt_enable($name = NULL) {
   // Get/validate name of shunt to be tripped.
-  $message = 'Choose which shunt to trip/enable.';
-  $name = _drush_shunt_name_choices($name, $message);
+  $message = 'Enter a number to choose which shunt to trip/enable.';
+  $shunts = _drush_shunt_name_choices();
+  $choice = FALSE;
+
+  // Check if the provided name ($name) is a valid shunt.
+  if ($name && !array_key_exists($name, $shunts)) {
+    return drush_set_error(dt("'!name' is not a valid shunt",
+      array('!name' => $name)));
+  }
+  elseif ($name && $name !== 'all') {
+    shunt_enable($name);
+  }
+  // If no $name is provided, offer choices.
+  elseif (!$name) {
+    $choice = drush_choice($shunts, $message, '!key');
+  }
 
   // Trip shunt.
-  if ($name == 'all') {
-    $shunts = module_invoke_all('shunt'); 
-    foreach ($shunts as $key => $description) {
-      shunt_enable($key);
-      drush_log(dt("'!key' shunt was tripped"));
+  if ($choice !== FALSE) {
+    if ($choice == 'all' || $name == 'all') {
+      $shunts = module_invoke_all('shunt');
+      foreach ($shunts as $key => $description) {
+        shunt_enable($key);
+        drush_log(dt("'!key' shunt was tripped"));
+      }
     }
-  }
-  else {
-    shunt_enable($name);
-    drush_log(dt("'!name' shunt was tripped"));
+    else {
+      shunt_enable($choice);
+      drush_log(dt("'!name' shunt was tripped"));
+    }
   }
 }
 
@@ -113,21 +129,10 @@ function drush_shunt_enable($name = NULL){
  *
  * @return string $name
  */
-function _drush_shunt_name_choices($name, $message) {
-  $shunts = module_invoke_all('shunt'); 
-  array_unshift($shunts, array('all' => 'all'));
-
-  // Check if the provided name ($name) is a valid shunt.
-  if ($name && !array_key_exists($name, $shunts)) {
-    return drush_set_error(dt("'!name' is not a valid shunt",
-    array('!name' => $name)));
-  }
-  // If no $name is provided, offer choices.
-  else if (!$name) {
-    $name = drush_choice($shunts, $message, '!key');
-  } 
-
-  return $name;
+function _drush_shunt_name_choices() {
+  $shunts = module_invoke_all('shunt');
+  $shunts = array_merge(array('all' => 'all'), $shunts);
+  return $shunts;
 }
 
 /**
@@ -139,22 +144,38 @@ function _drush_shunt_name_choices($name, $message) {
  * @see drush_invoke()
  * @see drush.api.php
  */
-function drush_shunt_disable($name = NULL){
+function drush_shunt_disable($name = NULL) {
   // Get/validate name of shunt to be tripped.
   $message = 'Enter a number to choose which shunt to disable.';
-  $name = _drush_shunt_name_choices($name, $message);
+  $shunts = _drush_shunt_name_choices();
+  $choice = FALSE;
+
+  // Check if the provided name ($name) is a valid shunt.
+  if ($name && !array_key_exists($name, $shunts)) {
+    return drush_set_error(dt("'!name' is not a valid shunt",
+      array('!name' => $name)));
+  }
+  elseif ($name && $name !== 'all') {
+    shunt_disable($name);
+  }
+  // If no $name is provided, offer choices.
+  elseif (!$name) {
+    $choice = drush_choice($shunts, $message, '!key');
+  }
 
   // Trip shunt.
-  if ($name == 'all') {
-    $shunts = module_invoke_all('shunt'); 
-    foreach ($shunts as $key => $description) {
-      shunt_disable($key);
-      drush_log(dt("'!key' shunt was disabled !insitename"));
+  if ($choice !== FALSE) {
+    if ($choice == 'all' || $name == 'all') {
+      $shunts = module_invoke_all('shunt');
+      foreach ($shunts as $key => $description) {
+        shunt_disable($key);
+        drush_log(dt("'!key' shunt was disabled !insitename"));
+      }
     }
-  }
-  else {
-    shunt_disable($name);
-    drush_log(dt("'!name' shunt was disabled !insitename"));
+    else {
+      shunt_disable($choice);
+      drush_log(dt("'!name' shunt was disabled !insitename"));
+    }
   }
 }
 
