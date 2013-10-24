@@ -55,8 +55,8 @@ function mymodule_does_something() {
  */
  function example_shunt() {
   return array(
-    'example' => 'This is a shunt for Example module. It disables something specific in Example module.',
+    'example' => t('This is a shunt for Example module. It disables something specific in Example module.'),
     // If your module needs two special shunt trips, you can implement as many as you need...
-    'example2' => 'Lorem ipsum.',
+    'example2' => t('Lorem ipsum.'),
   );
 }
