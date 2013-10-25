@@ -60,10 +60,10 @@ function shunt_admin_settings_form_submit($form, &$form_state) {
     // Set each shunt trip to enabled or disabled according to
     // which checkboxes the site admin checked.
     if ($values[$shunt_name]) {
-      shunt_enable($shunt_name);
+      shunt_enable_shunt($shunt_name);
     }
     else {
-      shunt_disable($shunt_name);
+      shunt_disable_shunt($shunt_name);
     }
   }
 }
@@ -96,13 +96,13 @@ function shunt_modules_uninstalled($modules) {
 }
 
 /**
- * Trip shunt(s).
+ * Enables one or more shunts.
  *
  * @param string $name
  *   (optional) The machine name of the shunt to enable. Defaults to NULL for
  *   all.
  */
-function shunt_enable($name = NULL) {
+function shunt_enable_shunt($name = NULL) {
   $shunts = shunt_get_shunt_definitions();
   // Check to see if $name is a valid shunt.
   if (!empty($name) && !array_key_exists($name, $shunts)) {
@@ -121,13 +121,13 @@ function shunt_enable($name = NULL) {
 }
 
 /**
- * Disable shunt(s).
+ * Disables one or more shunts.
  *
  * @param string $name
  *   (optional) The machine name of the shunt to disable. Defaults to NULL
  *   (all).
  */
-function shunt_disable($name = NULL) {
+function shunt_disable_shunt($name = NULL) {
   $shunts = shunt_get_shunt_definitions();
   // Confirm $name is a valid shunt name.
   if (!empty($name) && !array_key_exists($name, $shunts)) {

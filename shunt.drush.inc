@@ -86,7 +86,7 @@ function drush_shunt_enable($name = NULL) {
       array('!name' => $name)));
   }
   elseif ($name && $name !== 'all') {
-    shunt_enable($name);
+    shunt_enable_shunt($name);
   }
   // If no $name is provided, offer choices.
   elseif (!$name) {
@@ -98,12 +98,12 @@ function drush_shunt_enable($name = NULL) {
     if ($choice == 'all' || $name == 'all') {
       $shunts = shunt_get_shunt_definitions();
       foreach ($shunts as $key => $description) {
-        shunt_enable($key);
+        shunt_enable_shunt($key);
         drush_log(dt("'!key' shunt was tripped"));
       }
     }
     else {
-      shunt_enable($choice);
+      shunt_enable_shunt($choice);
       drush_log(dt("'!name' shunt was tripped"));
     }
   }
@@ -138,7 +138,7 @@ function drush_shunt_disable($name = NULL) {
       array('!name' => $name)));
   }
   elseif ($name && $name !== 'all') {
-    shunt_disable($name);
+    shunt_disable_shunt($name);
   }
   // If no $name is provided, offer choices.
   elseif (!$name) {
@@ -150,12 +150,12 @@ function drush_shunt_disable($name = NULL) {
     if ($choice == 'all' || $name == 'all') {
       $shunts = shunt_get_shunt_definitions();
       foreach ($shunts as $key => $description) {
-        shunt_disable($key);
+        shunt_disable_shunt($key);
         drush_log(dt("'!key' shunt was disabled !insitename"));
       }
     }
     else {
-      shunt_disable($choice);
+      shunt_disable_shunt($choice);
       drush_log(dt("'!name' shunt was disabled !insitename"));
     }
   }
