@@ -105,7 +105,7 @@ function drush_shunt_enable($name = NULL) {
   // Trip shunt.
   if ($choice !== FALSE) {
     if ($choice == 'all' || $name == 'all') {
-      $shunts = module_invoke_all('shunt');
+      $shunts = shunt_get_shunt_definitions();
       foreach ($shunts as $key => $description) {
         shunt_enable($key);
         drush_log(dt("'!key' shunt was tripped"));
@@ -130,7 +130,7 @@ function drush_shunt_enable($name = NULL) {
  * @return string $name
  */
 function _drush_shunt_name_choices() {
-  $shunts = module_invoke_all('shunt');
+  $shunts = shunt_get_shunt_definitions();
   $shunts = array_merge(array('all' => 'all'), $shunts);
   return $shunts;
 }
@@ -166,7 +166,7 @@ function drush_shunt_disable($name = NULL) {
   // Trip shunt.
   if ($choice !== FALSE) {
     if ($choice == 'all' || $name == 'all') {
-      $shunts = module_invoke_all('shunt');
+      $shunts = shunt_get_shunt_definitions();
       foreach ($shunts as $key => $description) {
         shunt_disable($key);
         drush_log(dt("'!key' shunt was disabled !insitename"));

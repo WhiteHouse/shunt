@@ -28,7 +28,7 @@ function shunt_menu() {
  */
 function shunt_admin_settings() {
   // Add checkboxes for shunt trips.
-  $shunts = module_invoke_all('shunt');
+  $shunts = shunt_get_shunt_definitions();
   foreach ($shunts as $shunt => $description) {
     $form[$shunt] = array(
       '#type' => 'checkbox',
@@ -55,7 +55,7 @@ function shunt_admin_settings_form_submit($form, &$form_state) {
   //  dsm($form, 'form');
   // dsm($form_state, 'form_state');
 
-  $shunts = module_invoke_all('shunt');
+  $shunts = shunt_get_shunt_definitions();
   $values = $form_state['values'];
   foreach ($shunts as $shunt_name => $shunt_description) {
     // Set each shunt trip to enabled or disabled according to
@@ -87,7 +87,7 @@ function shunt_modules_uninstalled($modules) {
   foreach ($modules as $module) {
     // Check if any modules being uninstalled implement shunt trips.
     if (in_array($module, $implementing_modules)) {
-      $shunts = module_invoke($module, 'shunt');
+      $shunts = shunt_get_shunt_definitions();
       foreach ($shunts as $variable => $description) {
         // Delete custom shunt variables.
         variable_del($variable);
@@ -103,7 +103,7 @@ function shunt_modules_uninstalled($modules) {
  *  Optional. Machine name of a specific shunt to trip. (Default to all.)
  */
 function shunt_enable($name = NULL) {
-  $shunts =  module_invoke_all('shunt');
+  $shunts = shunt_get_shunt_definitions();
   // Check to see if $name is a valid shunt.
   if (!empty($name) && !array_key_exists($name, $shunts)) {
     $text = t('Sorry. @name is not a valid shunt.', array('@name' => $name));
@@ -127,7 +127,7 @@ function shunt_enable($name = NULL) {
  *  Optional. Name of a specific shunt to trip. (Default to all.)
  */
 function shunt_disable($name = NULL) {
-  $shunts =  module_invoke_all('shunt');
+  $shunts = shunt_get_shunt_definitions();
   // Confirm $name is a valid shunt name.
   if (!empty($name) && !array_key_exists($name, $shunts)) {
     $text = t('Sorry. @name is not a valid shunt.', array('@name' => $name));
@@ -161,6 +161,25 @@ function shunt_get_disabled() {
 }
 
 /**
+ * Gets an array of available shunt definitions.
+ *
+ * @return array
+ *   An array of shunts. Each shunt item is keyed by its machine name and has a
+ *   value of a translated description string.
+ *
+ * @see hook_shunt()
+ */
+function shunt_get_shunt_definitions() {
+  $shunts = &drupal_static(__FUNCTION__);
+  if (!isset($shunts)) {
+    // Get definitions.
+    $shunts = module_invoke_all('shunt');
+    ksort($shunts);
+  }
+  return $shunts;
+}
+
+/**
  * Determine whether shunt is enabled.
  *
  * @param string $name.
@@ -191,7 +210,7 @@ function _shunt_get($status) {
   $shunts_disabled = array();
 
   // Check status for each shunt.
-  $shunts = module_invoke_all('shunt');
+  $shunts = shunt_get_shunt_definitions();
   foreach ($shunts as $name => $description) {
     if(variable_get($name, FALSE)) {
       $shunts_enabled[] = $name;
