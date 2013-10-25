@@ -62,7 +62,7 @@ function shunt_modules_uninstalled($modules) {
 function shunt_enable_shunt($name = NULL) {
   $shunts = shunt_get_shunt_definitions();
   // Check to see if $name is a valid shunt.
-  if (!empty($name) && !array_key_exists($name, $shunts)) {
+  if (!empty($name) && !shunt_exists($name)) {
     $text = t('Sorry. @name is not a valid shunt.', array('@name' => $name));
     drupal_set_message($text);
   }
@@ -87,7 +87,7 @@ function shunt_enable_shunt($name = NULL) {
 function shunt_disable_shunt($name = NULL) {
   $shunts = shunt_get_shunt_definitions();
   // Confirm $name is a valid shunt name.
-  if (!empty($name) && !array_key_exists($name, $shunts)) {
+  if (!empty($name) && !shunt_exists($name)) {
     $text = t('Sorry. @name is not a valid shunt.', array('@name' => $name));
     drupal_set_message($text);
   }
@@ -100,6 +100,20 @@ function shunt_disable_shunt($name = NULL) {
       _shunt_disable($name);
     }
   }
+}
+
+/**
+ * Determines whether a given shunt exists.
+ *
+ * @param string $name
+ *   The machine name of the shunt.
+ *
+ * @return bool
+ *   Returns TRUE if the shunt exists or FALSE if it doesn't.
+ */
+function shunt_exists($name) {
+  $shunts = shunt_get_shunt_definitions();
+  return array_key_exists($name, $shunts);
 }
 
 /**

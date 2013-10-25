@@ -83,7 +83,7 @@ function drush_shunt_enable($name = NULL) {
   $choice = FALSE;
 
   // Check if the provided name ($name) is a valid shunt.
-  if ($name && !array_key_exists($name, $shunts)) {
+  if ($name && !shunt_exists($name)) {
     return drush_set_error(dt("'!name' is not a valid shunt",
       array('!name' => $name)));
   }
@@ -138,7 +138,7 @@ function drush_shunt_disable($name = NULL) {
   $choice = FALSE;
 
   // Check if the provided name ($name) is a valid shunt.
-  if ($name && !array_key_exists($name, $shunts)) {
+  if ($name && !shunt_exists($name)) {
     return drush_set_error(dt("'!name' is not a valid shunt",
       array('!name' => $name)));
   }
