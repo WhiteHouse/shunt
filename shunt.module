@@ -124,7 +124,7 @@ function shunt_exists($name) {
  *   shunt_get_shunt_definitions().
  */
 function shunt_get_enabled() {
-  return _shunt_get('enabled');
+  return _shunt_get_by_status('enabled');
 }
 
 /**
@@ -135,7 +135,7 @@ function shunt_get_enabled() {
  *   shunt_get_shunt_definitions().
  */
 function shunt_get_disabled() {
-  return _shunt_get('disabled');
+  return _shunt_get_by_status('disabled');
 }
 
 /**
@@ -185,7 +185,7 @@ function shunt_is_enabled($name = 'shunt') {
  * @return array
  *   An indexed array of shunt machine names.
  */
-function _shunt_get($status) {
+function _shunt_get_by_status($status) {
   $shunts_enabled = array();
   $shunts_disabled = array();
 
