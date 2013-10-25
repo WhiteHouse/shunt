@@ -1,62 +1,100 @@
 <?php
+
 /**
- * Module developers can implement shunts for their own modules like this.
+ * @file
+ * Hooks provided by the Shunt module.
  */
-function mymodule_does_something() {
-  // Check to see if Shunt module is installed and the shunt is enabled.
-  $shunt_is_enabled = (module_exists('shunt') && shunt_is_enabled()) ? TRUE : FALSE;
 
-  // Or check to see if a specific shunt enabled.
-  $shunt_is_enabled = (shunt_is_enabled('my_special_shunt')) ? TRUE : FALSE;
+/**
+ * @addtogroup hooks
+ * @{
+ */
 
-  // Anywhere you want your module to be able to fail gracefully, do this:
-  if ($shunt_is_enabled) {
-    // Shunt is enabled. Fail gracefully.
-  }
-  else {
-    // Shunt is not enabled. Proceed.
-  }
+/**
+ * Define shunts.
+ *
+ * For more granular control than the default, master shunt provides, you can
+ * define any number of additional shunts and react to them individually. By
+ * depending on these, you can choose on a case-by-case basis which pieces of
+ * functionality to disable rather than having to disable all or none.
+ *
+ * Shunt machine names should be prefixed with the name of the module that
+ * defines them in order to avoid namespace conflicts. Beyond that, names have
+ * have no intrinsic meaning--the effect a given shunt has is entirely dependent
+ * on the application code that uses it.
+ *
+ * @return array
+ *   An array of shunts. Each shunt item is keyed by its machine name and has a
+ *   value of a translated description string.
+ */
+function hook_shunt() {
+  return array(
+    // It can be helpful to define a "master" shunt that toggles ALL
+    // functionality for your module as well as individual shunts for particular
+    // pieces of functionality.
+    'example' => t('The master shunt for the Example module. This toggles ALL module functionality.'),
+    'example_feature1' => t('This toggles feature 1 of the Example module.'),
+    'example_feature2' => t('This toggles feature 2 of the Example module.'),
+  );
 }
 
 /**
- * Implements hook_shunt_enable().
+ * React to a shunt being enabled.
  *
- * If your module needs to take a one-time action when the shunt is enabled
- * or disabled, implement hook_shunt_enable and hook_shunt_disable.
- *
- * @param string $name
- *  Name of shunt that was just enabled.
- */
- function example_shunt_enable($name) {
-   // This function is called when shunts are enabled.
- }
-
-/**
- * Implements hook_shunt_disable().
+ * Perform one-time actions in the event that a shunt gets enabled.
  *
  * @param string $name
- *  Name of shunt that was just disabled.
+ *   The name of shunt that was just enabled.
  */
- function example_shunt_disable($name) {
-   // This function is called when shunts are disabled.
- }
+function hook_shunt_enable($name) {
+  // React to a particular shunt being enabled.
+  if ($name == 'example') {
+    drupal_set_message(t('You just enabled "example"!'));
+    return;
+  }
+
+  // React to ANY shunt being enabled, whether it's defined in your module or
+  // not.
+  drupal_set_message(t('You just enabled "%name"!', array('%name' => $name)));
+}
 
 /**
- * Implements hook_shunt().
+ * React to a shunt being disabled.
  *
- *  If you want more granular control, your module can have its own checkbox on
- *  admin/settings/shunt. All you have to do is implement hook_shunt and
- *  return an array keyed by your own module's variable name.
+ * Perform one-time actions in the event that a shunt gets disabled.
  *
- *  Please prefix your variable with your module's name.
- *
- * @return
- *  Array. array('shunt_name' => 'description goes here');
+ * @param string $name
+ *   The name of shunt that was just disabled.
  */
- function example_shunt() {
-  return array(
-    'example' => t('This is a shunt for Example module. It disables something specific in Example module.'),
-    // If your module needs two special shunt trips, you can implement as many as you need...
-    'example2' => t('Lorem ipsum.'),
-  );
+function hook_shunt_disable($name) {
+  // React to a particular shunt being disabled.
+  if ($name == 'example') {
+    drupal_set_message(t('You just disabled "example"!'));
+    return;
+  }
+
+  // React to ANY shunt being disabled, whether it's defined in your module or
+  // not.
+  drupal_set_message(t('You just disabled "%name"!', array('%name' => $name)));
+}
+
+/**
+ * @} End of "addtogroup hooks".
+ */
+
+/**
+ * Demonstrates how to use shunts to make a module fail gracefully.
+ */
+function shunt_demonstrate_shunt_use() {
+  // Get the state of the shunts.
+  $master_shunt_is_enabled = (module_exists('shunt') && shunt_is_enabled()) ? TRUE : FALSE;
+  $specific_shunt_is_enabled = (module_exists('shunt') && shunt_is_enabled('example')) ? TRUE : FALSE;
+
+  // Depend on both shunts.
+  if ($master_shunt_is_enabled || $specific_shunt_is_enabled) {
+    // One of the shunts is enabled. Fail gracefully.
+  }
+  else {
+    // The shunts are disabled. Continue.
+  }
 }
