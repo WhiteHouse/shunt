@@ -96,7 +96,7 @@ function shunt_get_enabled() {
  * @see hook_shunt()
  */
 function shunt_get_shunt_definitions() {
-  $shunts = &drupal_static(__FUNCTION__);
+  static $shunts;
   if (!isset($shunts)) {
     // Get definitions.
     $shunts = module_invoke_all('shunt');
@@ -130,7 +130,7 @@ function shunt_is_enabled($shunt = 'shunt') {
 function shunt_menu() {
   $items = array();
 
-  $items['admin/config/system/shunt'] = array(
+  $items['admin/settings/shunt'] = array(
     'title' => 'Shunt',
     'description' => 'Configure shunts to make site functionality fail gracefully.',
     'page callback' => 'drupal_get_form',

@@ -24,12 +24,11 @@ function shunt_admin_settings_form() {
       '#description' => $description,
     );
   }
-  $form['actions']['#type'] = 'actions';
-  $form['actions']['submit'] = array(
+  $form['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Save configuration'),
+    '#submit' => array('shunt_admin_settings_form_submit'),
   );
-  $form['#submit'][] = 'shunt_admin_settings_form_submit';
 
   return $form;
 }

@@ -59,7 +59,7 @@ Enable ("trip") the shunt to disable targeted site functionality like this:
   B. Via admin GUI
 
     Go here:
-      admin/config/system/shunt
+      admin/settings/shunt
 
       Enable shunt check box. Save.
 
@@ -74,7 +74,7 @@ Reset the shunt to re-enable site functionality like this:
   B. Via admin GUI
 
     Go here:
-      admin/config/system/shunt
+      admin/settings/shunt
 
       Disable shunt check box. Save.
 
