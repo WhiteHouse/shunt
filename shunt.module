@@ -1,7 +1,10 @@
 <?php
+
 /**
  * @file
- * This is the main module file for Shunt.
+ * An API and UI for defining and interacting with "shunts".
+ *
+ * Enable your site to fail gracefully under strain.
  */
 
 /**
@@ -37,7 +40,6 @@ function shunt_admin_settings() {
       '#description' => $description,
     );
   }
-  //$form = system_settings_form($form);
   $form['actions']['#type'] = 'actions';
   $form['actions']['submit'] = array(
     '#type' => 'submit',
@@ -52,9 +54,6 @@ function shunt_admin_settings() {
  * Submit handler for shunt_admin_settings form.
  */
 function shunt_admin_settings_form_submit($form, &$form_state) {
-  //  dsm($form, 'form');
-  // dsm($form_state, 'form_state');
-
   $shunts = shunt_get_shunt_definitions();
   $values = $form_state['values'];
   foreach ($shunts as $shunt_name => $shunt_description) {
@@ -75,7 +74,7 @@ function shunt_admin_settings_form_submit($form, &$form_state) {
 function shunt_shunt() {
   return array(
     'shunt' => t('Trip (enable) the main shunt to notify modules to fail gracefully.'),
-  );  
+  );
 }
 
 /**
@@ -83,7 +82,7 @@ function shunt_shunt() {
  */
 function shunt_modules_uninstalled($modules) {
   // Get a list of modules implementing shut trips.
-  $implementing_modules = module_implements('shunt'); 
+  $implementing_modules = module_implements('shunt');
   foreach ($modules as $module) {
     // Check if any modules being uninstalled implement shunt trips.
     if (in_array($module, $implementing_modules)) {
@@ -100,7 +99,8 @@ function shunt_modules_uninstalled($modules) {
  * Trip shunt(s).
  *
  * @param string $name
- *  Optional. Machine name of a specific shunt to trip. (Default to all.)
+ *   (optional) The machine name of the shunt to enable. Defaults to NULL for
+ *   all.
  */
 function shunt_enable($name = NULL) {
   $shunts = shunt_get_shunt_definitions();
@@ -109,12 +109,12 @@ function shunt_enable($name = NULL) {
     $text = t('Sorry. @name is not a valid shunt.', array('@name' => $name));
     drupal_set_message($text);
   }
-  else if (!empty($name) && array_key_exists($name, $shunts)) {
+  elseif (!empty($name) && array_key_exists($name, $shunts)) {
     _shunt_enable($name);
-  } 
+  }
   // Trip all shunts if no specific $name is specified.
   else {
-    foreach($shunts as $name => $description) {
+    foreach ($shunts as $name => $description) {
       _shunt_enable($name);
     }
   }
@@ -124,7 +124,8 @@ function shunt_enable($name = NULL) {
  * Disable shunt(s).
  *
  * @param string $name
- *  Optional. Name of a specific shunt to trip. (Default to all.)
+ *   (optional) The machine name of the shunt to disable. Defaults to NULL
+ *   (all).
  */
 function shunt_disable($name = NULL) {
   $shunts = shunt_get_shunt_definitions();
@@ -133,28 +134,34 @@ function shunt_disable($name = NULL) {
     $text = t('Sorry. @name is not a valid shunt.', array('@name' => $name));
     drupal_set_message($text);
   }
-  else if (!empty($name) && array_key_exists($name, $shunts)) {
+  elseif (!empty($name) && array_key_exists($name, $shunts)) {
     _shunt_disable($name);
-  } 
+  }
   // Disable all shunts if no specific $name is specified.
   else {
-    foreach($shunts as $name => $description) {
+    foreach ($shunts as $name => $description) {
       _shunt_disable($name);
     }
   }
 }
 
 /**
- * @return array $shunts
- *  Array of shunts that are enabled.
+ * Gets a list of enabled shunts.
+ *
+ * @return array
+ *   An array of shunts that are enabled, as returned by
+ *   shunt_get_shunt_definitions().
  */
 function shunt_get_enabled() {
   return _shunt_get('enabled');
 }
 
 /**
- * @return array $shunts
- *  Array of shunts that are disabled.
+ * Gets a list of disabled shunts.
+ *
+ * @return array
+ *   An array of shunts that are disabled, as returned by
+ *   shunt_get_shunt_definitions().
  */
 function shunt_get_disabled() {
   return _shunt_get('disabled');
@@ -182,11 +189,11 @@ function shunt_get_shunt_definitions() {
 /**
  * Determine whether shunt is enabled.
  *
- * @param string $name.
- *  Name of shunt to check status of.
+ * @param string $name
+ *   The name of the shunt to check.
  *
- * @return boolean $shunt_is_enabled.
- *  Is $name shunt enabled?
+ * @return bool
+ *   TRUE if the shunt is enabled or FALSE if it is disabled.
  */
 function shunt_is_enabled($name = 'shunt') {
   if ($name) {
@@ -198,12 +205,14 @@ function shunt_is_enabled($name = 'shunt') {
 }
 
 /**
- * Internal function. Return array of enabled or disabled shunts.
+ * Gets an array of shunts by status.
  *
  * @param string $status
- *  'enabled' or 'disabled'
+ *   The status to filter the shunt list by. Accepted values are "enabled" and
+ *   "disabled".
  *
  * @return array
+ *   An indexed array of shunt machine names.
  */
 function _shunt_get($status) {
   $shunts_enabled = array();
@@ -212,29 +221,30 @@ function _shunt_get($status) {
   // Check status for each shunt.
   $shunts = shunt_get_shunt_definitions();
   foreach ($shunts as $name => $description) {
-    if(variable_get($name, FALSE)) {
+    if (variable_get($name, FALSE)) {
       $shunts_enabled[] = $name;
     }
     else {
-      $shunts_disabled[] = $name;   
+      $shunts_disabled[] = $name;
     }
   }
 
   // Set $result to requested list of shunt trips.
-  if ($status == 'enabled'){
-   $result = $shunts_enabled;
+  if ($status == 'enabled') {
+    $result = $shunts_enabled;
   }
-  else if ($status == 'disabled') {
-   $result = $shunts_disabled;
+  elseif ($status == 'disabled') {
+    $result = $shunts_disabled;
   }
 
   return $result;
 }
 
 /**
- * Internal function to trip a specific shunt.
+ * Enables a given shunt.
  *
- * @param string $name.
+ * @param string $name
+ *   The name of the shunt to enable.
  */
 function _shunt_enable($name) {
   // Trip the shunt.
@@ -249,9 +259,10 @@ function _shunt_enable($name) {
 }
 
 /**
- * Internal function to disable a specific shunt.
+ * Disables a given shunt.
  *
- * @param string $name.
+ * @param string $name
+ *   The name of the shunt to enable.
  */
 function _shunt_disable($name) {
   // Trip the shunt.
@@ -264,4 +275,3 @@ function _shunt_disable($name) {
   // Give other modules an opportunity to react to this shunt being disabled.
   module_invoke_all('shunt_disable', $name);
 }
-

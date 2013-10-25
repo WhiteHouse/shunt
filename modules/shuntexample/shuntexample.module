@@ -1,7 +1,8 @@
 <?php
+
 /**
  * @file
- * This is the main module file for Example Custom Shunt.
+ * An example implementation of of Shunt module.
  */
 
 /**
@@ -9,6 +10,6 @@
  */
 function shuntexample_shunt() {
   return array(
-    'shuntexample_shunt_is_enabled' => 'This is an example of a custom shunt.',
+    'shuntexample' => 'An example shunt.',
   );
 }

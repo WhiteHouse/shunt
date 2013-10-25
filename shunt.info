@@ -1,4 +1,4 @@
 name = Shunt
-description = This module lets site administrators "trip a shunt" to signal to modules that the site is strained and features should fail gracefully.
+description = An API and UI for defining and interacting with "shunts" that enable your site to fail gracefully under strain.
 core = 7.x
 package = Shunt
