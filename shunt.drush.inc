@@ -12,25 +12,27 @@ function shunt_drush_command() {
   $items = array();
 
   $items['shunt-enable'] = array(
-    'description' => "Enable shunt(s)",
+    'description' => 'Enable one or more shunts.',
     'arguments' => array(
-      'name' => 'The particular shunt to trip. Omit to choose from a list of options.',
+      'name' => '(optional) The machine name of a shunt to enable, or "all" for all shunts. Omit to interactively choose from a list of available shunts.',
     ),
     'examples' => array(
-      'drush shunt-enable' => 'Enable ("trip") the shunt(s).',
-      'drush se' => 'Enable ("trip") the shunt(s).',
+      'drush se all' => 'Enable all shunts.',
+      'drush se example' => 'Enable the "example" shunt.',
+      'drush se' => 'Choose from a list of shunts to enable at the prompt.',
     ),
     'aliases' => array('se'),
   );
 
   $items['shunt-disable'] = array(
-    'description' => "Disable shunt(s)",
+    'description' => 'Disable one or more shunts.',
     'arguments' => array(
-      'name' => 'The particular shunt to trip. Omit to choose from a list of options.',
+      'name' => '(optional) The machine name of a shunt to disable, or "all" for all shunts. Omit to interactively choose from a list of available shunts.',
     ),
     'examples' => array(
-      'drush shunt-disable' => 'Enable ("trip") the shunt(s).',
-      'drush sd' => 'Disable ("trip") the shunt(s).',
+      'drush sd all' => 'Disable all shunts.',
+      'drush sd example' => 'Disable the "example" shunt.',
+      'drush sd' => 'Choose from a list of shunts to disable at the prompt.',
     ),
     'aliases' => array('sd'),
   );
@@ -56,7 +58,7 @@ function shunt_drush_command() {
   $items['shunt-is-enabled'] = array(
     'description' => "Determine if shunt is tripped/enabled.",
     'argument' => array(
-      'name' => 'Optional. Name of the shunt to check (if you want to check one particular shunt).',
+      'name' => '(optional) The machine name of the shunt to check. Defaults to "shunt".',
     ),
     'examples' => array(
       'drush shunt-is-enabled' => 'Determine if sandwich shunt is enabled',
@@ -85,7 +87,10 @@ function drush_shunt_enable($name = NULL) {
     return drush_set_error(dt("'!name' is not a valid shunt",
       array('!name' => $name)));
   }
-  elseif ($name && $name !== 'all') {
+  elseif ($name == 'all') {
+    shunt_enable_shunt();
+  }
+  elseif ($name) {
     shunt_enable_shunt($name);
   }
   // If no $name is provided, offer choices.
@@ -137,7 +142,10 @@ function drush_shunt_disable($name = NULL) {
     return drush_set_error(dt("'!name' is not a valid shunt",
       array('!name' => $name)));
   }
-  elseif ($name && $name !== 'all') {
+  elseif ($name == 'all') {
+    shunt_disable_shunt();
+  }
+  elseif ($name) {
     shunt_disable_shunt($name);
   }
   // If no $name is provided, offer choices.
