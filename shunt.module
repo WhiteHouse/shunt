@@ -15,57 +15,14 @@ function shunt_menu() {
 
   $items['admin/config/system/shunt'] = array(
     'title' => 'Shunt',
-    'description' => 'Notify other modules to fail gracefully.',
+    'description' => 'Configure shunts to make site functionality fail gracefully.',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('shunt_admin_settings'),
+    'page arguments' => array('shunt_admin_settings_form'),
     'access arguments' => array('administer site configuration'),
+    'file' => 'shunt.admin.inc',
   );
 
   return $items;
-}
-
-/**
- * Callback for admin/config/system/shunt.
- *
- * @see system_settings_form
- */
-function shunt_admin_settings() {
-  // Add checkboxes for shunt trips.
-  $shunts = shunt_get_shunt_definitions();
-  foreach ($shunts as $shunt => $description) {
-    $form[$shunt] = array(
-      '#type' => 'checkbox',
-      '#title' => $shunt,
-      '#default_value' => variable_get($shunt, FALSE),
-      '#description' => $description,
-    );
-  }
-  $form['actions']['#type'] = 'actions';
-  $form['actions']['submit'] = array(
-    '#type' => 'submit',
-    '#value' => t('Save configuration'),
-  );
-  $form['#submit'][] = 'shunt_admin_settings_form_submit';
-
-  return $form;
-}
-
-/**
- * Submit handler for shunt_admin_settings form.
- */
-function shunt_admin_settings_form_submit($form, &$form_state) {
-  $shunts = shunt_get_shunt_definitions();
-  $values = $form_state['values'];
-  foreach ($shunts as $shunt_name => $shunt_description) {
-    // Set each shunt trip to enabled or disabled according to
-    // which checkboxes the site admin checked.
-    if ($values[$shunt_name]) {
-      shunt_enable_shunt($shunt_name);
-    }
-    else {
-      shunt_disable_shunt($shunt_name);
-    }
-  }
 }
 
 /**
