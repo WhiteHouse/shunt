@@ -1,5 +1,5 @@
-name = Example Custom Shunt
+name = Shunt example
 description = An example implementation of of Shunt module.
 core = 7.x
-package = Shunt
+package = Example modules
 dependencies[] = shunt

@@ -1,4 +1,5 @@
 name = Shunt
 description = An API and UI for defining and interacting with "shunts" that enable your site to fail gracefully under strain.
 core = 7.x
-package = Shunt
+package = Performance and scalability
+configure = admin/config/system/shunt
