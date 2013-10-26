@@ -1,69 +1,86 @@
-README
-======
 
-About
------
+CONTENTS OF THIS FILE
+---------------------
+
+ * Introduction
+ * Installation
+ * Usage
+ * Implementation
+
+
+INTRODUCTION
+------------
 
   "In electronics, a shunt is a device which allows electric current to pass
   around another point in the circuit by creating a low resistance path."
-  source: http://en.wikipedia.org/wiki/Shunt_(electrical)
+  - source: http://en.wikipedia.org/wiki/Shunt_(electrical)
 
-  In an emergency situation you can "trip the shunt" to instruct Drupal to
-  degrade gracefully.
+Shunt module provides a facility for developers to create virtual "shunts" that
+site administrators can trip in emergency situations, instructing Drupal to fail
+gracefully where functionality depends on them.
 
-  For example, if your site is the target of a denial of service (DOS) attack,
-  you may want to disable forms to prevent legitimate users from trying to write
-  to the database during the attack (to prevent them from getting white screens
-  or getting frustrated when their data doesn't save).
+For example, you might create a shunt that disable certain expensive database
+operations, so that in case of an overwhelming traffic event like a denial of
+service (DOS) attack you have a way of both reducing load on the server and
+saving legitimate users the frustration of getting white screens or losing form
+submissions.
 
-  By itself, this module doesn't do anything. It just keeps track of whether the
-  shunt is enabled, lets modules check if the shunt is enabled, and provides
-  hooks to let modules react to shunts being enabled/disabled.
+This is an API module. By itself it doesn't add such functionality. Rather, it
+provides module developers the ability to define shunts and make functionality
+dependant on them, and it gives site administrators the ability to trip and
+reset shunts via the web UI and via Drush.
 
-  Note: For implementing modules to effectively degrade features gracefully,
-  they should not require cache clears.
-
-
-Usage
-------
-
-  To see all available drush commands, do this:
-
-    drush --filter=shunt
+Note: For implementing modules to effectively degrade features gracefully, they
+should not require cache clears.
 
 
-  Enable ("trip") the shunt to disable targeted site functionality like this:
+INSTALLATION
+------------
 
-    A. Via Drush:
-
-      drush shunt-enable
-
-
-    B. Via admin GUI
-
-      Go here:
-        admin/config/system/shunt
-
-        Enable shunt check box. Save.
-
-  
-  Disable the shunt to re-enable site functionality like this:
-
-    A. Via Drush:
-
-      drush shunt-disable
+Shunt module is installed in the usual way. See
+http://drupal.org/documentation/install/modules-themes/modules-7.
 
 
-    B. Via admin GUI
+USAGE
+-----
 
-      Go here:
-        admin/config/system/shunt
+To see all available drush commands, execute this command:
 
-        Disable shunt check box. Save.
+  drush --filter=shunt
 
 
-Developers
-----------
+Enable ("trip") the shunt to disable targeted site functionality like this:
 
-  For instructions and examples on how to shunt-enable a module, see
-  shunt.api.php.
+  A. Via Drush:
+
+    drush shunt-enable
+
+
+  B. Via admin GUI
+
+    Go here:
+      admin/config/system/shunt
+
+      Enable shunt check box. Save.
+
+
+Reset the shunt to re-enable site functionality like this:
+
+  A. Via Drush:
+
+    drush shunt-disable
+
+
+  B. Via admin GUI
+
+    Go here:
+      admin/config/system/shunt
+
+      Disable shunt check box. Save.
+
+
+IMPLEMENTATION
+--------------
+
+For instructions and examples on how to shunt-enable a module, see
+shunt.api.php.
