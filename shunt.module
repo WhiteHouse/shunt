@@ -158,21 +158,22 @@ function shunt_get_shunt_definitions() {
 }
 
 /**
- * Determine whether shunt is enabled.
+ * Determine whether a given shunt is enabled.
  *
- * @param string $name
- *   The name of the shunt to check.
+ * @param string $shunt
+ *   (optional) The machine name of the shunt. Defaults to "shunt".
  *
  * @return bool
  *   TRUE if the shunt is enabled or FALSE if it is disabled.
  */
-function shunt_is_enabled($name = 'shunt') {
-  if ($name) {
-    $shunts_enabled = shunt_get_enabled();
-    $shunt_is_enabled = in_array($name, $shunts_enabled);
+function shunt_is_enabled($shunt = 'shunt') {
+  // Any shunt which does not exist may be considered to be disabled.
+  if (!shunt_exists($shunt)) {
+    return FALSE;
   }
 
-  return $shunt_is_enabled;
+  $variable = _shunt_get_variable_name($shunt);
+  return (bool) variable_get($variable, FALSE);
 }
 
 /**
@@ -192,7 +193,7 @@ function _shunt_get_by_status($status) {
   // Check status for each shunt.
   $shunts = shunt_get_shunt_definitions();
   foreach ($shunts as $name => $description) {
-    if (variable_get($name, FALSE)) {
+    if (shunt_is_enabled($name)) {
       $shunts_enabled[] = $name;
     }
     else {
@@ -245,4 +246,17 @@ function _shunt_disable($name) {
 
   // Give other modules an opportunity to react to this shunt being disabled.
   module_invoke_all('shunt_disable', $name);
+}
+
+/**
+ * Gets the name of the Drupal variable where a given shunt's status is stored.
+ *
+ * @param string $shunt
+ *   The machine name of the shunt.
+ *
+ * @return string
+ *   The variable name.
+ */
+function _shunt_get_variable_name($shunt) {
+  return $shunt;
 }

@@ -20,7 +20,7 @@ function shunt_admin_settings_form() {
     $form[$shunt] = array(
       '#type' => 'checkbox',
       '#title' => $shunt,
-      '#default_value' => variable_get($shunt, FALSE),
+      '#default_value' => shunt_is_enabled($shunt),
       '#description' => $description,
     );
   }
