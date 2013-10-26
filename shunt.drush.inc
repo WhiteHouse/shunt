@@ -76,9 +76,9 @@ function shunt_drush_command() {
  *
  * @see shunt_drush_command()
  */
-function drush_shunt_enable($name = NULL) {
+function drush_shunt_enable($shunt = NULL) {
   // Prompt the user to choose a shunt if none is specified.
-  $choice = ($name) ? $name : _shunt_prompt_for_shunt_choice();
+  $choice = ($shunt) ? $shunt : _shunt_prompt_for_shunt_choice();
 
   // Disable the selection.
   if ($choice == 'all') {
@@ -94,9 +94,9 @@ function drush_shunt_enable($name = NULL) {
  *
  * @see shunt_drush_command()
  */
-function drush_shunt_disable($name = NULL) {
+function drush_shunt_disable($shunt = NULL) {
   // Prompt the user to choose a shunt if none is specified.
-  $choice = ($name) ? $name : _shunt_prompt_for_shunt_choice();
+  $choice = ($shunt) ? $shunt : _shunt_prompt_for_shunt_choice();
 
   // Disable the selection.
   if ($choice == 'all') {
@@ -152,14 +152,14 @@ function drush_shunt_get_disabled() {
  *
  * @see shunt_drush_command()
  */
-function drush_shunt_is_enabled($name = '') {
-  if ($name) {
-    $shunt_is_enabled = shunt_is_enabled($name);
-    drush_print($name . 'shunt is tripped/enabled');
+function drush_shunt_is_enabled($shunt = '') {
+  if ($shunt) {
+    $shunt_is_enabled = shunt_is_enabled($shunt);
+    drush_print($shunt . 'shunt is tripped/enabled');
   }
   else {
     $shunt_is_enabled = shunt_is_enabled();
-    drush_print($name . 'shunt is NOT tripped/enabled');
+    drush_print($shunt . 'shunt is NOT tripped/enabled');
   }
 }
 

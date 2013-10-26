@@ -53,15 +53,15 @@ function shunt_modules_uninstalled($modules) {
 }
 
 /**
- * Enables one or more shunts.
+ * Enables one or all shunts.
  *
- * @param string $name
+ * @param string $shunt
  *   (optional) The machine name of the shunt to enable. Defaults to NULL for
  *   all.
  */
-function shunt_enable_shunt($name = NULL) {
-  if ($name) {
-    _shunt_set_status($name, TRUE);
+function shunt_enable_shunt($shunt = NULL) {
+  if ($shunt) {
+    _shunt_set_status($shunt, TRUE);
   }
   else {
     $shunts = shunt_get_shunt_definitions();
@@ -72,15 +72,15 @@ function shunt_enable_shunt($name = NULL) {
 }
 
 /**
- * Disables one or more shunts.
+ * Disables one or all shunts.
  *
- * @param string $name
+ * @param string $shunt
  *   (optional) The machine name of the shunt to disable. Defaults to NULL
  *   (all).
  */
-function shunt_disable_shunt($name = NULL) {
-  if ($name) {
-    _shunt_set_status($name, FALSE);
+function shunt_disable_shunt($shunt = NULL) {
+  if ($shunt) {
+    _shunt_set_status($shunt, FALSE);
   }
   else {
     $shunts = shunt_get_shunt_definitions();
@@ -93,15 +93,15 @@ function shunt_disable_shunt($name = NULL) {
 /**
  * Determines whether a given shunt exists.
  *
- * @param string $name
+ * @param string $shunt
  *   The machine name of the shunt.
  *
  * @return bool
  *   Returns TRUE if the shunt exists or FALSE if it doesn't.
  */
-function shunt_exists($name) {
+function shunt_exists($shunt) {
   $shunts = shunt_get_shunt_definitions();
-  return array_key_exists($name, $shunts);
+  return array_key_exists($shunt, $shunts);
 }
 
 /**

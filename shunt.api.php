@@ -43,19 +43,19 @@ function hook_shunt() {
  *
  * Perform one-time actions in the event that a shunt gets enabled.
  *
- * @param string $name
- *   The name of shunt that was just enabled.
+ * @param string $shunt
+ *   The machine name of shunt that was just enabled.
  */
-function hook_shunt_enable($name) {
+function hook_shunt_enable($shunt) {
   // React to a particular shunt being enabled.
-  if ($name == 'example') {
+  if ($shunt == 'example') {
     drupal_set_message(t('You just enabled "example"!'));
     return;
   }
 
   // React to ANY shunt being enabled, whether it's defined in your module or
   // not.
-  drupal_set_message(t('You just enabled "%name"!', array('%name' => $name)));
+  drupal_set_message(t('You just enabled "%name"!', array('%name' => $shunt)));
 }
 
 /**
@@ -63,19 +63,19 @@ function hook_shunt_enable($name) {
  *
  * Perform one-time actions in the event that a shunt gets disabled.
  *
- * @param string $name
- *   The name of shunt that was just disabled.
+ * @param string $shunt
+ *   The machine name of shunt that was just disabled.
  */
-function hook_shunt_disable($name) {
+function hook_shunt_disable($shunt) {
   // React to a particular shunt being disabled.
-  if ($name == 'example') {
+  if ($shunt == 'example') {
     drupal_set_message(t('You just disabled "example"!'));
     return;
   }
 
   // React to ANY shunt being disabled, whether it's defined in your module or
   // not.
-  drupal_set_message(t('You just disabled "%name"!', array('%name' => $name)));
+  drupal_set_message(t('You just disabled "%name"!', array('%name' => $shunt)));
 }
 
 /**
