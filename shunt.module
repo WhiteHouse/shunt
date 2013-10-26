@@ -8,6 +8,11 @@
  */
 
 /**
+ * The variable name prefix for shunt status persistent variables.
+ */
+define('SHUNT_VARIABLE_PREFIX', 'shunt_');
+
+/**
  * Implements hook_menu().
  */
 function shunt_menu() {
@@ -32,24 +37,6 @@ function shunt_shunt() {
   return array(
     'shunt' => t('Trip (enable) the main shunt to notify modules to fail gracefully.'),
   );
-}
-
-/**
- * Implements hook_modules_uninstalled().
- */
-function shunt_modules_uninstalled($modules) {
-  // Get a list of modules implementing shut trips.
-  $implementing_modules = module_implements('shunt');
-  foreach ($modules as $module) {
-    // Check if any modules being uninstalled implement shunt trips.
-    if (in_array($module, $implementing_modules)) {
-      $shunts = shunt_get_shunt_definitions();
-      foreach ($shunts as $variable => $description) {
-        // Delete custom shunt variables.
-        variable_del($variable);
-      }
-    }
-  }
 }
 
 /**
@@ -210,7 +197,7 @@ function _shunt_get_by_status($status) {
  *   The variable name.
  */
 function _shunt_get_variable_name($shunt) {
-  return $shunt;
+  return SHUNT_VARIABLE_PREFIX . $shunt;
 }
 
 /**
