@@ -60,19 +60,13 @@ function shunt_modules_uninstalled($modules) {
  *   all.
  */
 function shunt_enable_shunt($name = NULL) {
-  $shunts = shunt_get_shunt_definitions();
-  // Check to see if $name is a valid shunt.
-  if (!empty($name) && !shunt_exists($name)) {
-    $text = t('Sorry. @name is not a valid shunt.', array('@name' => $name));
-    drupal_set_message($text);
+  if ($name) {
+    _shunt_set_status($name, TRUE);
   }
-  elseif (!empty($name) && array_key_exists($name, $shunts)) {
-    _shunt_enable($name);
-  }
-  // Trip all shunts if no specific $name is specified.
   else {
+    $shunts = shunt_get_shunt_definitions();
     foreach ($shunts as $name => $description) {
-      _shunt_enable($name);
+      _shunt_set_status($name, TRUE);
     }
   }
 }
@@ -85,19 +79,13 @@ function shunt_enable_shunt($name = NULL) {
  *   (all).
  */
 function shunt_disable_shunt($name = NULL) {
-  $shunts = shunt_get_shunt_definitions();
-  // Confirm $name is a valid shunt name.
-  if (!empty($name) && !shunt_exists($name)) {
-    $text = t('Sorry. @name is not a valid shunt.', array('@name' => $name));
-    drupal_set_message($text);
+  if ($name) {
+    _shunt_set_status($name, FALSE);
   }
-  elseif (!empty($name) && array_key_exists($name, $shunts)) {
-    _shunt_disable($name);
-  }
-  // Disable all shunts if no specific $name is specified.
   else {
+    $shunts = shunt_get_shunt_definitions();
     foreach ($shunts as $name => $description) {
-      _shunt_disable($name);
+      _shunt_set_status($name, FALSE);
     }
   }
 }
@@ -213,42 +201,6 @@ function _shunt_get_by_status($status) {
 }
 
 /**
- * Enables a given shunt.
- *
- * @param string $name
- *   The name of the shunt to enable.
- */
-function _shunt_enable($name) {
-  // Trip the shunt.
-  variable_set($name, TRUE);
-
-  // Give user a confirmation message.
-  $text = t('"@name" shunt is tripped.', array('@name' => $name));
-  drupal_set_message($text);
-
-  // Give other modules an opportunity to react to this shunt being tripped.
-  module_invoke_all('shunt_enable', $name);
-}
-
-/**
- * Disables a given shunt.
- *
- * @param string $name
- *   The name of the shunt to enable.
- */
-function _shunt_disable($name) {
-  // Trip the shunt.
-  variable_set($name, FALSE);
-
-  // Give user a confirmation message.
-  $text = t('"@name" shunt is disabled.', array('@name' => $name));
-  drupal_set_message($text);
-
-  // Give other modules an opportunity to react to this shunt being disabled.
-  module_invoke_all('shunt_disable', $name);
-}
-
-/**
  * Gets the name of the Drupal variable where a given shunt's status is stored.
  *
  * @param string $shunt
@@ -259,4 +211,80 @@ function _shunt_disable($name) {
  */
 function _shunt_get_variable_name($shunt) {
   return $shunt;
+}
+
+/**
+ * Sets the status of a given shunt.
+ *
+ * @param string $shunt
+ *   The machine name of the shunt.
+ * @param bool $status
+ *   TRUE to enable or FALSE to disable.
+ */
+function _shunt_set_status($shunt, $status) {
+  _shunt_set_status_multiple(array($shunt => $status));
+}
+
+/**
+ * Sets the status of a given set of shunts.
+ *
+ * @param array $shunts
+ *   An array of shunt statuses. Each item key is a shunt machine name, and its
+ *   corresponding value is the new status for that shunt.
+ * @param bool $warn_when_same
+ *   (optional) Whether or not a warning should be issued when refusing to set a
+ *   shunt status because the new status is the same as the old one. TRUE if it
+ *   should or FALSE if it should not. Defaults to TRUE.
+ */
+function _shunt_set_status_multiple($shunts, $warn_when_same = TRUE) {
+  foreach ($shunts as $shunt => $status) {
+    // Store arguments for t() reused below.
+    $args = array('@name' => $shunt);
+
+    // Make sure the shunt exists.
+    if (!shunt_exists($shunt)) {
+      drupal_set_message(t('No such shunt "@name".', $args), 'error');
+      continue;
+    }
+
+    // Type cast the new value for strict comparison.
+    $new_status = (bool) $status;
+
+    // Find out if the new status is actually different from the current one and
+    // don't hit the database or invoke hooks unless it is.
+    $current_status = shunt_is_enabled($shunt);
+    if ($new_status === $current_status) {
+      // Conditionally warn the user.
+      if ($warn_when_same) {
+        if ($new_status) {
+          $message = t('Shunt "@name" is already enabled.', $args);
+        }
+        else {
+          $message = t('Shunt "@name" is already disabled.', $args);
+        }
+        drupal_set_message($message, 'warning');
+      }
+
+      continue;
+    }
+
+    // Update the status variable.
+    $variable = _shunt_get_variable_name($shunt);
+    variable_set($variable, $new_status);
+
+    if ($new_status) {
+      // Fire hook_shunt_enable().
+      module_invoke_all('shunt_enable', $shunt);
+
+      // Report success.
+      drupal_set_message(t('Shunt "@name" has been enabled.', $args));
+    }
+    else {
+      // Fire hook_shunt_disable().
+      module_invoke_all('shunt_disable', $shunt);
+
+      // Report success.
+      drupal_set_message(t('Shunt "@name" has been disabled.', $args));
+    }
+  }
 }

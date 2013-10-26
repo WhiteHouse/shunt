@@ -77,12 +77,6 @@ function shunt_drush_command() {
  * @see shunt_drush_command()
  */
 function drush_shunt_enable($name = NULL) {
-  // Check if the provided name ($name) is a valid shunt.
-  if ($name && $name !== 'all' && !shunt_exists($name)) {
-    return drush_set_error(dt("'!name' is not a valid shunt",
-      array('!name' => $name)));
-  }
-
   // Prompt the user to choose a shunt if none is specified.
   $choice = ($name) ? $name : _shunt_prompt_for_shunt_choice();
 
@@ -101,12 +95,6 @@ function drush_shunt_enable($name = NULL) {
  * @see shunt_drush_command()
  */
 function drush_shunt_disable($name = NULL) {
-  // Check if the provided name ($name) is a valid shunt.
-  if ($name && $name !== 'all' && !shunt_exists($name)) {
-    return drush_set_error(dt("'!name' is not a valid shunt",
-      array('!name' => $name)));
-  }
-
   // Prompt the user to choose a shunt if none is specified.
   $choice = ($name) ? $name : _shunt_prompt_for_shunt_choice();
 
