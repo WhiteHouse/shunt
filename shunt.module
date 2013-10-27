@@ -13,30 +13,22 @@
 define('SHUNT_VARIABLE_PREFIX', 'shunt_');
 
 /**
- * Implements hook_menu().
+ * Disables one or all shunts.
+ *
+ * @param string $shunt
+ *   (optional) The machine name of the shunt to disable. Defaults to NULL
+ *   (all).
  */
-function shunt_menu() {
-  $items = array();
-
-  $items['admin/config/system/shunt'] = array(
-    'title' => 'Shunt',
-    'description' => 'Configure shunts to make site functionality fail gracefully.',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('shunt_admin_settings_form'),
-    'access arguments' => array('administer site configuration'),
-    'file' => 'shunt.admin.inc',
-  );
-
-  return $items;
-}
-
-/**
- * Implements hook_shunt().
- */
-function shunt_shunt() {
-  return array(
-    'shunt' => t('Trip (enable) the main shunt to notify modules to fail gracefully.'),
-  );
+function shunt_disable_shunt($shunt = NULL) {
+  if ($shunt) {
+    _shunt_set_status($shunt, FALSE);
+  }
+  else {
+    $shunts = shunt_get_shunt_definitions();
+    foreach ($shunts as $name => $description) {
+      _shunt_set_status($name, FALSE);
+    }
+  }
 }
 
 /**
@@ -59,25 +51,6 @@ function shunt_enable_shunt($shunt = NULL) {
 }
 
 /**
- * Disables one or all shunts.
- *
- * @param string $shunt
- *   (optional) The machine name of the shunt to disable. Defaults to NULL
- *   (all).
- */
-function shunt_disable_shunt($shunt = NULL) {
-  if ($shunt) {
-    _shunt_set_status($shunt, FALSE);
-  }
-  else {
-    $shunts = shunt_get_shunt_definitions();
-    foreach ($shunts as $name => $description) {
-      _shunt_set_status($name, FALSE);
-    }
-  }
-}
-
-/**
  * Determines whether a given shunt exists.
  *
  * @param string $shunt
@@ -92,17 +65,6 @@ function shunt_exists($shunt) {
 }
 
 /**
- * Gets a list of enabled shunts.
- *
- * @return array
- *   An array of shunts that are enabled, as returned by
- *   shunt_get_shunt_definitions().
- */
-function shunt_get_enabled() {
-  return _shunt_get_by_status('enabled');
-}
-
-/**
  * Gets a list of disabled shunts.
  *
  * @return array
@@ -111,6 +73,17 @@ function shunt_get_enabled() {
  */
 function shunt_get_disabled() {
   return _shunt_get_by_status('disabled');
+}
+
+/**
+ * Gets a list of enabled shunts.
+ *
+ * @return array
+ *   An array of shunts that are enabled, as returned by
+ *   shunt_get_shunt_definitions().
+ */
+function shunt_get_enabled() {
+  return _shunt_get_by_status('enabled');
 }
 
 /**
@@ -149,6 +122,33 @@ function shunt_is_enabled($shunt = 'shunt') {
 
   $variable = _shunt_get_variable_name($shunt);
   return (bool) variable_get($variable, FALSE);
+}
+
+/**
+ * Implements hook_menu().
+ */
+function shunt_menu() {
+  $items = array();
+
+  $items['admin/config/system/shunt'] = array(
+    'title' => 'Shunt',
+    'description' => 'Configure shunts to make site functionality fail gracefully.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('shunt_admin_settings_form'),
+    'access arguments' => array('administer site configuration'),
+    'file' => 'shunt.admin.inc',
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_shunt().
+ */
+function shunt_shunt() {
+  return array(
+    'shunt' => t('Trip (enable) the main shunt to notify modules to fail gracefully.'),
+  );
 }
 
 /**
