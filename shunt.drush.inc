@@ -80,6 +80,11 @@ function drush_shunt_disable($shunt = NULL) {
   // Prompt the user to choose a shunt if none is specified.
   $choice = ($shunt) ? $shunt : _shunt_prompt_for_shunt_choice();
 
+  // Return if cancelled.
+  if ($choice === FALSE) {
+    return;
+  }
+
   // Disable the selection.
   if ($choice == 'all') {
     shunt_disable_shunt();
@@ -97,6 +102,11 @@ function drush_shunt_disable($shunt = NULL) {
 function drush_shunt_enable($shunt = NULL) {
   // Prompt the user to choose a shunt if none is specified.
   $choice = ($shunt) ? $shunt : _shunt_prompt_for_shunt_choice();
+
+  // Return if cancelled.
+  if ($choice === FALSE) {
+    return;
+  }
 
   // Disable the selection.
   if ($choice == 'all') {
@@ -165,9 +175,9 @@ function drush_shunt_is_enabled($shunt = '') {
 /**
  * Prompts the user to choose from a list of available shunts.
  *
- * @return string
- *   The value of the option (i.e., the shunt machine name) chosen, or an empty
- *   string if canceled.
+ * @return string|false
+ *   The value of the option (i.e., the shunt machine name) chosen, or FALSE if
+ *   cancelled.
  */
 function _shunt_prompt_for_shunt_choice() {
   // Populate the option list with available shunts.
@@ -175,11 +185,11 @@ function _shunt_prompt_for_shunt_choice() {
   $options = drupal_map_assoc($shunt_names);
 
   // Prepend an "all" option.
-  array_unshift($options, array('all' => 'all'));
+  array_unshift($options, array('all' => 'All'));
 
   $prompt = t('Choose a shunt');
 
   $choice = drush_choice($options, $prompt);
 
-  return ($choice) ? $choice : '';
+  return $choice;
 }
