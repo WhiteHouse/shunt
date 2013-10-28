@@ -147,7 +147,7 @@ function shunt_menu() {
  */
 function shunt_shunt() {
   return array(
-    'shunt' => t('Trip (enable) the main shunt to notify modules to fail gracefully.'),
+    'shunt' => t('The default shunt.'),
   );
 }
 
