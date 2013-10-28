@@ -153,13 +153,12 @@ function drush_shunt_get_enabled() {
  * @see shunt_drush_command()
  */
 function drush_shunt_is_enabled($shunt = '') {
-  if ($shunt) {
-    $shunt_is_enabled = shunt_is_enabled($shunt);
-    drush_print($shunt . 'shunt is tripped/enabled');
+  $args = array('@name' => $shunt);
+  if (shunt_is_enabled($shunt)) {
+    drush_print(dt('Shunt "@name" IS enabled.', $args));
   }
   else {
-    $shunt_is_enabled = shunt_is_enabled();
-    drush_print($shunt . 'shunt is NOT tripped/enabled');
+    drush_print(dt('Shunt "@name" is NOT enabled.', $args));
   }
 }
 
