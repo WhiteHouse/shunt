@@ -35,7 +35,7 @@ INSTALLATION
 ------------
 
 Shunt module is installed in the usual way. See
-http://drupal.org/documentation/install/modules-themes/modules-7.
+https://drupal.org/documentation/install/modules-themes/modules-7.
 
 
 USAGE
