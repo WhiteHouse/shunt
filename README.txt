@@ -19,7 +19,7 @@ Shunt module provides a facility for developers to create virtual "shunts" that
 site administrators can trip in emergency situations, instructing Drupal to fail
 gracefully where functionality depends on them.
 
-For example, you might create a shunt that disable certain expensive database
+For example, you might create a shunt that disables certain expensive database
 operations, so that in case of an overwhelming traffic event like a denial of
 service (DOS) attack you have a way of both reducing load on the server and
 saving legitimate users the frustration of getting white screens or losing form
