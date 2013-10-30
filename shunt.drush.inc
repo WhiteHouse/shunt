@@ -37,24 +37,6 @@ function shunt_drush_command() {
     'aliases' => array('sd'),
   );
 
-  $items['shunt-get-enabled'] = array(
-    'description' => "Get a list of enabled (\"tripped\") shunts.",
-    'examples' => array(
-      'drush shunt-get-enabled' => 'Get a list of enabled shunt trips.',
-      'drush sge' => '',
-    ),
-    'aliases' => array('sge'),
-  );
-
-  $items['shunt-get-disabled'] = array(
-    'description' => "Get a list of disabled shunt trips.",
-    'examples' => array(
-      'drush shunt-get-disabled' => 'Get a list of disabled shunt trips.',
-      'drush sgd' => '',
-    ),
-    'aliases' => array('sgd'),
-  );
-
   $items['shunt-is-enabled'] = array(
     'description' => "Determine if shunt is tripped/enabled.",
     'argument' => array(
@@ -66,6 +48,31 @@ function shunt_drush_command() {
       'drush sie sandwich' => '',
     ),
     'aliases' => array('sie', 'sit', 'shunt-is-tripped'),
+  );
+
+  $items['shunt-list'] = array(
+    'description' => 'Show a list of available shunts with their statuses.',
+    'options' => array(
+      'status' => array(
+        'description' => 'Filter by shunt status. Choices: "enabled", "disabled".',
+        'example-value' => 'enabled',
+      ),
+    ),
+    'examples' => array(
+      'drush shunt-list' => 'Show all shunts.',
+      'drush shunt-list --status=enabled' => 'Show only enabled shunts.',
+    ),
+    'outputformat' => array(
+      'default' => 'table',
+      'pipe-format' => 'list',
+      'field-labels' => array(
+        'name' => 'Name',
+        'description' => 'Description',
+        'status' => 'Status',
+      ),
+      'output-data-type' => 'format-table',
+    ),
+    'aliases' => array('shl'),
   );
 
   return $items;
@@ -122,46 +129,6 @@ function drush_shunt_enable($shunt = NULL) {
  *
  * @see shunt_drush_command()
  */
-function drush_shunt_get_disabled() {
-  $shunts = shunt_get_disabled();
-  if (count($shunts) > 0) {
-    $text = t('These shunts are currently disabled:');
-    foreach ($shunts as $name) {
-      $text .= "\n$name";
-    }
-  }
-  else {
-    $text = t('No shunts are currently disabled. (All shunts are tripped.)');
-  }
-
-  drush_print($text);
-}
-
-/**
- * Implements drush_hook_COMMAND().
- *
- * @see shunt_drush_command()
- */
-function drush_shunt_get_enabled() {
-  $shunts = shunt_get_enabled();
-  if (count($shunts) > 0) {
-    $text = t('These shunts are currently "tripped" or enabled:');
-    foreach ($shunts as $name) {
-      $text .= "\n$name";
-    }
-  }
-  else {
-    $text = t('No shunts are currently "tripped" or enabled.');
-  }
-
-  drush_print($text);
-}
-
-/**
- * Implements drush_hook_COMMAND().
- *
- * @see shunt_drush_command()
- */
 function drush_shunt_is_enabled($shunt = '') {
   $args = array('@name' => $shunt);
   if (shunt_is_enabled($shunt)) {
@@ -170,6 +137,53 @@ function drush_shunt_is_enabled($shunt = '') {
   else {
     drush_print(dt('Shunt "@name" is NOT enabled.', $args));
   }
+}
+
+/**
+ * Implements drush_hook_COMMAND().
+ *
+ * @see shunt_drush_command()
+ */
+function drush_shunt_list() {
+  // Prepare and validate "status" filter.
+  $all_statuses = array('enabled', 'disabled');
+  $status_filter = strtolower(drush_get_option('status'));
+  if (!empty($status_filter)) {
+    $status_filter = explode(',', $status_filter);
+  }
+  else {
+    $status_filter = $all_statuses;
+  }
+  if (count($status_filter) == 1) {
+    drush_hide_output_fields('status');
+  }
+  foreach ($status_filter as $status) {
+    if (!in_array($status, $all_statuses)) {
+      return drush_set_error('SHUNT_INVALID_STATUS', dt('"!status" is not a valid shunt status.', array(
+        '!status' => $status,
+      )));
+    }
+  }
+
+  // Build result table.
+  $result = array();
+  $shunts = shunt_get_shunt_definitions();
+  foreach ($shunts as $name => $description) {
+    // Filter by status.
+    $status = (shunt_is_enabled($name)) ? 'enabled' : 'disabled';
+    if (!in_array($status, $status_filter)) {
+      continue;
+    }
+
+    // Build row.
+    $result[$name] = array(
+      'name' => $name,
+      'description' => $description,
+      'status' => ucfirst($status),
+    );
+  }
+
+  return $result;
 }
 
 /**
