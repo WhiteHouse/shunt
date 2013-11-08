@@ -16,20 +16,3 @@ function shunt_uninstall() {
     ->execute();
   cache_clear_all('variables', 'cache_bootstrap');
 }
-
-/**
- * Update persistent variable names.
- */
-function shunt_update_7100() {
-  $shunts = shunt_get_shunt_definitions();
-  foreach ($shunts as $name => $description) {
-    $old_variable = $name;
-    $status = variable_get($old_variable, NULL);
-    // If the old variable exists, rename it.
-    if (!is_null($status)) {
-      $new_variable = _shunt_get_variable_name($name);
-      variable_set($new_variable, $status);
-      variable_del($old_variable);
-    }
-  }
-}

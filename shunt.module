@@ -130,13 +130,11 @@ function shunt_is_enabled($shunt = 'shunt') {
 function shunt_menu() {
   $items = array();
 
-  $items['admin/config/system/shunt'] = array(
-    'title' => 'Shunt',
+  $items['admin/config/system/shunts'] = array(
+    'title' => 'Shunts',
     'description' => 'Configure shunts to make site functionality fail gracefully.',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('shunt_admin_settings_form'),
-    'access arguments' => array('administer site configuration'),
-    'file' => 'shunt.admin.inc',
+    'type' => MENU_NORMAL_ITEM,
+    'route_name' => 'shunt.config',
   );
 
   return $items;
