@@ -37,17 +37,26 @@ function shunt_drush_command() {
     'aliases' => array('sd'),
   );
 
-  $items['shunt-is-enabled'] = array(
-    'description' => "Determine if shunt is tripped/enabled.",
-    'argument' => array(
-      'name' => '(optional) The machine name of the shunt to check. Defaults to "shunt".',
+  $items['shunt-info'] = array(
+    'description' => 'Show detailed info for one or more shunts.',
+    'arguments' => array(
+      'names' => 'A list of shunt machine names. You can use the wildcard (*) at the end of shunt names to show info for multiple matches. If no argument is provided it will show info for all available shunts.',
     ),
     'examples' => array(
-      'drush shunt-is-enabled' => 'Determine if sandwich shunt is enabled',
-      'drush shunt-is-enabled sandwich' => 'Determine if sandwich shunt is enabled',
-      'drush sie sandwich' => '',
+      'drush shunt-info example' => 'Show info for the "example" shunt.',
+      'drush shunt-info example\*' => 'Show info for all shunts whose names begin with "example".',
     ),
-    'aliases' => array('sie', 'sit', 'shunt-is-tripped'),
+    'aliases' => array('shi'),
+    'outputformat' => array(
+      'default' => 'key-value-list',
+      'pipe-format' => 'json',
+      'field-labels' => array(
+        'name' => 'Name',
+        'description' => 'Description',
+        'status' => 'Status',
+      ),
+      'output-data-type' => 'format-table',
+    ),
   );
 
   $items['shunt-list'] = array(
@@ -129,14 +138,35 @@ function drush_shunt_enable($shunt = NULL) {
  *
  * @see shunt_drush_command()
  */
-function drush_shunt_is_enabled($shunt = '') {
-  $args = array('@name' => $shunt);
-  if (shunt_is_enabled($shunt)) {
-    drush_print(dt('Shunt "@name" IS enabled.', $args));
+function drush_shunt_info() {
+  $shunt_info = shunt_get_shunt_definitions();
+
+  $args = _convert_csv_to_array(func_get_args());
+  _shunt_expand_shunt_names($args);
+
+  // If no shunts are specified, show all.
+  if (count($args) == 0) {
+    $args = array_keys($shunt_info);
   }
-  else {
-    drush_print(dt('Shunt "@name" is NOT enabled.', $args));
+
+  $result = array();
+
+  foreach ($args as $shunt) {
+    if (!isset($shunt_info[$shunt])) {
+      drush_log(dt('No such shunt "@name".', array(
+        '@name' => $shunt,
+      )), 'warning');
+      continue;
+    }
+
+    $result[$shunt] = array(
+      'name' => $shunt,
+      'description' => $shunt_info[$shunt],
+      'status' => shunt_is_enabled($shunt) ? 'enabled' : 'disabled',
+    );
   }
+
+  return $result;
 }
 
 /**
@@ -184,6 +214,32 @@ function drush_shunt_list() {
   }
 
   return $result;
+}
+
+/**
+ * Performs shunt name expansion for trailing wildcards (*).
+ *
+ * Given a list of shunt names, this function identifies names with a trailing
+ * wildcard (*) and replaces them with actual shunt names that match the
+ * expansion pattern.
+ *
+ * @param array $shunts
+ *   An indexed array of shunt names, by reference.
+ */
+function _shunt_expand_shunt_names(array &$shunts) {
+  $shunt_info = shunt_get_shunt_definitions();
+  foreach ($shunts as $key => $shunt) {
+    $wildcard = rtrim($shunt, '*');
+    if ($wildcard !== $shunt) {
+      foreach (array_keys($shunt_info) as $shunt_name) {
+        if (substr($shunt_name, 0, strlen($wildcard)) == $wildcard) {
+          $shunts[] = $shunt_name;
+        }
+      }
+      unset($shunts[$key]);
+      continue;
+    }
+  }
 }
 
 /**
