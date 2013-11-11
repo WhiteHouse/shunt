@@ -8,11 +8,6 @@
  */
 
 /**
- * The variable name prefix for shunt status persistent variables.
- */
-define('SHUNT_VARIABLE_PREFIX', 'shunt_');
-
-/**
  * Disables one or all shunts.
  *
  * @param string $shunt
@@ -98,8 +93,7 @@ function shunt_is_enabled($shunt = 'shunt') {
     return FALSE;
   }
 
-  $variable = _shunt_get_variable_name($shunt);
-  return (bool) variable_get($variable, FALSE);
+  return Drupal::state()->get("shunt.{$shunt}", FALSE);
 }
 
 /**
@@ -125,19 +119,6 @@ function shunt_shunt() {
   return array(
     'shunt' => t('The default shunt.'),
   );
-}
-
-/**
- * Gets the name of the Drupal variable where a given shunt's status is stored.
- *
- * @param string $shunt
- *   The machine name of the shunt.
- *
- * @return string
- *   The variable name.
- */
-function _shunt_get_variable_name($shunt) {
-  return SHUNT_VARIABLE_PREFIX . $shunt;
 }
 
 /**
@@ -178,7 +159,7 @@ function _shunt_set_status_multiple($shunts, $warn_when_same = TRUE) {
     $new_status = (bool) $status;
 
     // Find out if the new status is actually different from the current one and
-    // don't hit the database or invoke hooks unless it is.
+    // don't invoke hooks unless it is.
     $current_status = shunt_is_enabled($shunt);
     if ($new_status === $current_status) {
       // Conditionally warn the user.
@@ -195,9 +176,8 @@ function _shunt_set_status_multiple($shunts, $warn_when_same = TRUE) {
       continue;
     }
 
-    // Update the status variable.
-    $variable = _shunt_get_variable_name($shunt);
-    variable_set($variable, $new_status);
+    // Update the status.
+    Drupal::state()->set("shunt.{$shunt}", $new_status);
 
     if ($new_status) {
       // Fire hook_shunt_enable().

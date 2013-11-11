@@ -8,7 +8,7 @@
 /**
  * Implements hook_uninstall().
  */
-function shunt_uninstall() {
+function shuntexample_uninstall() {
   // Remove state.
-  Drupal::state()->delete('shunt.shunt');
+  Drupal::state()->delete('shunt.shuntexample');
 }
