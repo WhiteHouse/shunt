@@ -17,11 +17,11 @@ function shunt_drush_command() {
       'name' => '(optional) The machine name of a shunt to enable, or "all" for all shunts. Omit to interactively choose from a list of available shunts.',
     ),
     'examples' => array(
-      'drush se all' => 'Enable all shunts.',
-      'drush se example' => 'Enable the "example" shunt.',
-      'drush se' => 'Choose from a list of shunts to enable at the prompt.',
+      'drush shunt-enable all' => 'Enable all shunts.',
+      'drush shunt-enable example' => 'Enable the "example" shunt.',
+      'drush shunt-enable' => 'Choose from a list of shunts to enable at the prompt.',
     ),
-    'aliases' => array('se'),
+    'aliases' => array('she'),
   );
 
   $items['shunt-disable'] = array(
@@ -30,11 +30,11 @@ function shunt_drush_command() {
       'name' => '(optional) The machine name of a shunt to disable, or "all" for all shunts. Omit to interactively choose from a list of available shunts.',
     ),
     'examples' => array(
-      'drush sd all' => 'Disable all shunts.',
-      'drush sd example' => 'Disable the "example" shunt.',
-      'drush sd' => 'Choose from a list of shunts to disable at the prompt.',
+      'drush shunt-disable all' => 'Disable all shunts.',
+      'drush shunt-disable example' => 'Disable the "example" shunt.',
+      'drush shunt-disable' => 'Choose from a list of shunts to disable at the prompt.',
     ),
-    'aliases' => array('sd'),
+    'aliases' => array('shd'),
   );
 
   $items['shunt-info'] = array(
