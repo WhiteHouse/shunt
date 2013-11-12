@@ -5,6 +5,8 @@
  * Drush commands for the Shunt module.
  */
 
+use Drupal\shunt\Shunt;
+
 /**
  * Implements hook_drush_command().
  */
@@ -103,10 +105,10 @@ function drush_shunt_disable($shunt = NULL) {
 
   // Disable the selection.
   if ($choice == 'all') {
-    shunt_disable_shunt();
+    Shunt::disable();
   }
   else {
-    shunt_disable_shunt($choice);
+    Shunt::disable($choice);
   }
 }
 
@@ -126,10 +128,10 @@ function drush_shunt_enable($shunt = NULL) {
 
   // Disable the selection.
   if ($choice == 'all') {
-    shunt_enable_shunt();
+    Shunt::enable();
   }
   else {
-    shunt_enable_shunt($choice);
+    Shunt::enable($choice);
   }
 }
 
@@ -139,7 +141,7 @@ function drush_shunt_enable($shunt = NULL) {
  * @see shunt_drush_command()
  */
 function drush_shunt_info() {
-  $shunt_info = shunt_get_shunt_definitions();
+  $shunt_info = Shunt::getDefinitions();
 
   $args = _convert_csv_to_array(func_get_args());
   _shunt_expand_shunt_names($args);
@@ -162,7 +164,7 @@ function drush_shunt_info() {
     $result[$shunt] = array(
       'name' => $shunt,
       'description' => $shunt_info[$shunt],
-      'status' => shunt_is_enabled($shunt) ? 'enabled' : 'disabled',
+      'status' => Shunt::isEnabled($shunt) ? 'enabled' : 'disabled',
     );
   }
 
@@ -197,10 +199,10 @@ function drush_shunt_list() {
 
   // Build result table.
   $result = array();
-  $shunts = shunt_get_shunt_definitions();
+  $shunts = Shunt::getDefinitions();
   foreach ($shunts as $name => $description) {
     // Filter by status.
-    $status = (shunt_is_enabled($name)) ? 'enabled' : 'disabled';
+    $status = (Shunt::isEnabled($name)) ? 'enabled' : 'disabled';
     if (!in_array($status, $status_filter)) {
       continue;
     }
@@ -227,7 +229,7 @@ function drush_shunt_list() {
  *   An indexed array of shunt names, by reference.
  */
 function _shunt_expand_shunt_names(array &$shunts) {
-  $shunt_info = shunt_get_shunt_definitions();
+  $shunt_info = Shunt::getDefinitions();
   foreach ($shunts as $key => $shunt) {
     $wildcard = rtrim($shunt, '*');
     if ($wildcard !== $shunt) {
@@ -251,7 +253,7 @@ function _shunt_expand_shunt_names(array &$shunts) {
  */
 function _shunt_prompt_for_shunt_choice() {
   // Populate the option list with available shunts.
-  $shunt_names = array_keys(shunt_get_shunt_definitions());
+  $shunt_names = array_keys(Shunt::getDefinitions());
   $options = drupal_map_assoc($shunt_names);
 
   // Prepend an "all" option.
