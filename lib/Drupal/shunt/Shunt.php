@@ -15,41 +15,45 @@ use Drupal;
 class Shunt {
 
   /**
-   * Disables one or all shunts.
+   * Disables a given shunt.
    *
    * @param string $shunt
-   *   (optional) The machine name of the shunt to disable. Defaults to NULL
-   *   (all).
+   *   The machine name of the shunt to disable.
    */
-  public static function disable($shunt = NULL) {
-    if ($shunt) {
-      static::setStatus($shunt, FALSE);
-    }
-    else {
-      $shunts = self::getDefinitions();
-      foreach ($shunts as $name => $description) {
-        static::setStatus($name, FALSE);
-      }
-    }
+  public static function disable($shunt) {
+    self::disableMultiple(array($shunt));
   }
 
   /**
-   * Enables one or all shunts.
+   * Disables a given list of shunts.
+   *
+   * @param string $shunts
+   *   An indexed array of the machine names of the shunts to disable.
+   */
+  public static function disableMultiple($shunts) {
+    $statuses = array_fill_keys($shunts, FALSE);
+    self::setStatusMultiple($statuses);
+  }
+
+  /**
+   * Enables a given shunt.
    *
    * @param string $shunt
-   *   (optional) The machine name of the shunt to enable. Defaults to NULL for
-   *   all.
+   *   The machine name of the shunt to enable.
    */
-  public static function enable($shunt = NULL) {
-    if ($shunt) {
-      static::setStatus($shunt, TRUE);
-    }
-    else {
-      $shunts = self::getDefinitions();
-      foreach ($shunts as $name => $description) {
-        static::setStatus($name, TRUE);
-      }
-    }
+  public static function enable($shunt) {
+    self::enableMultiple(array($shunt));
+  }
+
+  /**
+   * Enables a given list of shunts.
+   *
+   * @param string $shunts
+   *   An indexed array of the machine names of the shunts to enable.
+   */
+  public static function enableMultiple($shunts) {
+    $statuses = array_fill_keys($shunts, TRUE);
+    self::setStatusMultiple($statuses);
   }
 
   /**
@@ -106,18 +110,6 @@ class Shunt {
     }
 
     return Drupal::state()->get("shunt.{$shunt}", FALSE);
-  }
-
-  /**
-   * Sets the status of a given shunt.
-   *
-   * @param string $shunt
-   *   The machine name of the shunt.
-   * @param bool $status
-   *   TRUE to enable or FALSE to disable.
-   */
-  public static function setStatus($shunt, $status) {
-    self::setStatusMultiple(array($shunt => $status));
   }
 
   /**

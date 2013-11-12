@@ -95,21 +95,7 @@ function shunt_drush_command() {
  * @see shunt_drush_command()
  */
 function drush_shunt_disable($shunt = NULL) {
-  // Prompt the user to choose a shunt if none is specified.
-  $choice = ($shunt) ? $shunt : _shunt_prompt_for_shunt_choice();
-
-  // Return if cancelled.
-  if ($choice === FALSE) {
-    return;
-  }
-
-  // Disable the selection.
-  if ($choice == 'all') {
-    Shunt::disable();
-  }
-  else {
-    Shunt::disable($choice);
-  }
+  _shunt_enable_or_disable($shunt, 'disable');
 }
 
 /**
@@ -118,21 +104,7 @@ function drush_shunt_disable($shunt = NULL) {
  * @see shunt_drush_command()
  */
 function drush_shunt_enable($shunt = NULL) {
-  // Prompt the user to choose a shunt if none is specified.
-  $choice = ($shunt) ? $shunt : _shunt_prompt_for_shunt_choice();
-
-  // Return if cancelled.
-  if ($choice === FALSE) {
-    return;
-  }
-
-  // Disable the selection.
-  if ($choice == 'all') {
-    Shunt::enable();
-  }
-  else {
-    Shunt::enable($choice);
-  }
+  _shunt_enable_or_disable($shunt, 'enable');
 }
 
 /**
@@ -216,6 +188,46 @@ function drush_shunt_list() {
   }
 
   return $result;
+}
+
+/**
+ * Handles shunt selection and status operation for enable/disable commands.
+ *
+ * @param string $selection
+ *   The user-supplied command argument. May be the machine name of a shunt,
+ *   "all", or NULL.
+ * @param string $operation
+ *   The status value. Accepted values are "enable" and "disable".
+ *
+ * @see drush_shunt_disable()
+ * @see drush_shunt_enable()
+ */
+function _shunt_enable_or_disable($selection, $operation) {
+  // Make sure specified operation is valid.
+  $valid_operations = array('enable', 'disable');
+  if (!in_array($operation, $valid_operations)) {
+    return;
+  }
+
+  // Prompt the user to choose a shunt if none is specified.
+  $choice = ($selection) ? $selection : _shunt_prompt_for_shunt_choice();
+
+  // Return if cancelled.
+  if ($choice === FALSE) {
+    return;
+  }
+
+  // Prepare the shunt list.
+  if ($choice == 'all') {
+    $shunt_list = array_keys(Shunt::getDefinitions());
+  }
+  else {
+    $shunt_list = array($choice);
+  }
+
+  // Perform the operation on the selection.
+  $method = "{$operation}Multiple";
+  Shunt::$method($shunt_list);
 }
 
 /**
