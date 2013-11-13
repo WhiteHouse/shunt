@@ -4,4 +4,4 @@ shunt.config:
     _title: Shunts
     _form: '\Drupal\shunt\Form\ShuntConfigForm'
   requirements:
-    _permission: 'administer site configuration'
+    _permission: 'administer shunts'

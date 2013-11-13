@@ -10,6 +10,19 @@
 Use Drupal\shunt\Shunt;
 
 /**
+ * Determines whether a given shunt is enabled or not.
+ *
+ * @param string $shunt
+ *   (optional) The machine name of the shunt. Defaults to "shunt".
+ *
+ * @return bool
+ *   Returns TRUE if the shunt is enabled or FALSE if it is disabled.
+ */
+function shunt_is_enabled($shunt = 'shunt') {
+  return Shunt::isEnabled($shunt);
+}
+
+/**
  * Implements hook_menu().
  */
 function shunt_menu() {
@@ -26,16 +39,15 @@ function shunt_menu() {
 }
 
 /**
- * Determines whether a given shunt is enabled or not.
- *
- * @param string $shunt
- *   (optional) The machine name of the shunt. Defaults to "shunt".
- *
- * @return bool
- *   Returns TRUE if the shunt is enabled or FALSE if it is disabled.
+ * Implements hook_permission().
  */
-function shunt_is_enabled($shunt = 'shunt') {
-  return Shunt::isEnabled($shunt);
+function shunt_permission() {
+  return array(
+    'administer shunts' => array(
+      'title' => t('Administer shunts'),
+      'description' => t('Enable and disable shunts.'),
+    ),
+  );
 }
 
 /**
