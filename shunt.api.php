@@ -39,43 +39,63 @@ function hook_shunt() {
 }
 
 /**
- * React to a shunt being enabled.
+ * React to a shunt being changed.
  *
- * Perform one-time actions in the event that a shunt gets enabled.
+ * Perform one-time actions after a shunt gets enabled or disabled. This hook
+ * will be invoked once for each change in a changeset as it happens. If you
+ * want to react only once to the whole set, use hook_shunt_post_changeset()
+ * instead.
  *
  * @param string $shunt
- *   The machine name of shunt that was just enabled.
+ *   The machine name of shunt that was changed.
+ * @param bool $change
+ *   The change that took place: either "enabled" or "disabled".
  */
-function hook_shunt_enable($shunt) {
-  // React to a particular shunt being enabled.
+function hook_shunt_post_change($shunt, $change) {
+  // React to a particular shunt being changed.
   if ($shunt == 'example') {
-    drupal_set_message(t('You just enabled "example"!'));
-    return;
+
+    // React differently based on operation.
+    if ($change == 'enabled') {
+      drupal_set_message(t('You just enabled "example"!'));
+    }
+    else {
+      drupal_set_message(t('You just disabled "example"!'));
+    }
   }
 
-  // React to ANY shunt being enabled, whether it's defined in your module or
-  // not.
-  drupal_set_message(t('You just enabled "%name"!', array('%name' => $shunt)));
+  // React to a change to ANY shunt--whether it's defined in your module or not.
+  drupal_set_message(t('You just changed "@name"!', array('@name' => $shunt)));
 }
 
 /**
- * React to a shunt being disabled.
+ * React to a batch of shunt changes.
  *
- * Perform one-time actions in the event that a shunt gets disabled.
+ * Perform one-time actions after an entire batch of shunt changes is completed.
+ * If you want to react to each individual shunt change, use
+ * hook_shunt_post_change() instead.
  *
- * @param string $shunt
- *   The machine name of shunt that was just disabled.
+ * This hook is only invoked if the status of at least one shunt is actually
+ * changed.
+ *
+ * @param array $changes
+ *   An array of shunt/change pairs for shunts whose statuses changed, where
+ *   each key is a shunt machine name and its corresponding value is the change
+ *   that took place: either "enabled" or "disabled".
  */
-function hook_shunt_disable($shunt) {
-  // React to a particular shunt being disabled.
-  if ($shunt == 'example') {
-    drupal_set_message(t('You just disabled "example"!'));
-    return;
+function hook_shunt_post_changeset($changes) {
+  // This hook provides great flexibility to test for complex conditions so as
+  // to avoid performing expensive operations more often than absolutely
+  // necessary.
+  if (isset($changes['example_feature1']) && isset($changes['example_feature2'])) {
+    if ($changes['example_feature1'] == 'enabled') {
+      // Avoid scheduling expensive operations for shunt enable, when your site
+      // is probably already under strain.
+    }
+    elseif ($changes['example_feature1'] == 'disabled') {
+      // Clear caches, send an "all clear" email, etc.
+    }
   }
-
-  // React to ANY shunt being disabled, whether it's defined in your module or
-  // not.
-  drupal_set_message(t('You just disabled "%name"!', array('%name' => $shunt)));
 }
 
 /**
