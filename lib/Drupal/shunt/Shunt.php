@@ -76,8 +76,7 @@ class Shunt {
    *   Returns TRUE if the shunt exists or FALSE if it doesn't.
    */
   public static function exists($shunt) {
-    // Make sure shunt name is valid first.
-    if (!(is_string($shunt) && strlen($shunt))) {
+    if (!static::isValidName($shunt)) {
       return FALSE;
     }
 
@@ -92,16 +91,31 @@ class Shunt {
    *   An array of shunts. Each shunt item is keyed by its machine name and has
    *   a value of a translated description string.
    *
+   * @throws \Drupal\shunt\ShuntException
+   *   Throws an exception if an invalid shunt definition is detected.
+   *
    * @see hook_shunt()
    */
   public static function getDefinitions() {
     $shunts = &drupal_static(__FUNCTION__);
     if (!isset($shunts)) {
       // Get definitions.
-      $shunts = Drupal::moduleHandler()->invokeAll('shunt');
-      ksort($shunts);
+      $definitions = Drupal::moduleHandler()->invokeAll('shunt');
+
+      foreach ($definitions as $name => $description) {
+        // Reject invalid shunt names.
+        if (!self::isValidName($name)) {
+          throw new ShuntException("Invalid shunt name \"{$name}\"");
+        }
+
+        // Sanitize descriptions.
+        $definitions[$name] = check_plain($description);
+      }
+
+      // Sort by machine name.
+      ksort($definitions);
     }
-    return $shunts;
+    return $definitions;
   }
 
   /**
@@ -120,6 +134,33 @@ class Shunt {
     }
 
     return Drupal::state()->get("shunt.{$shunt}", FALSE);
+  }
+
+  /**
+   * Determines whether a given shunt name is valid or not.
+   *
+   * Any valid PHP label is a valid shunt name--except for "all", which is
+   * reserved for use with Drush.
+   *
+   * @param string $name
+   *   The name to test.
+   *
+   * @return bool
+   *   Returns TRUE if the given name is valid or FALSE if it is not.
+   */
+  public static function isValidName($name) {
+    if (!is_string($name)) {
+      return FALSE;
+    }
+
+    $reserved_words = array('all');
+    if (in_array($name, $reserved_words)) {
+      return FALSE;
+    }
+
+    // @see http://php.net/manual/en/language.variables.basics.php
+    $pattern = '/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/';
+    return (bool) preg_match($pattern, $name);
   }
 
   /**

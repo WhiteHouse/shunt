@@ -18,10 +18,14 @@
  * depending on these, you can choose on a case-by-case basis which pieces of
  * functionality to disable rather than having to disable all or none.
  *
- * Shunt machine names should be prefixed with the name of the module that
- * defines them in order to avoid namespace conflicts. Beyond that, names have
- * have no intrinsic meaning--the effect a given shunt has is entirely dependent
- * on the application code that uses it.
+ * Shunt machine names can be any valid PHP label except for "all". They should
+ * be prefixed with the name of the module that defines them in order to avoid
+ * namespace conflicts. Beyond that, names have have no intrinsic meaning--the
+ * effect a given shunt has is entirely dependent on the application code that
+ * uses it.
+ *
+ * Shunt descriptions should be plain text (no HTML). Anything else will be
+ * stripped out.
  *
  * @return array
  *   An array of shunts. Each shunt item is keyed by its machine name and has a
