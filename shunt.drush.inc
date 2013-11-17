@@ -16,12 +16,12 @@ function shunt_drush_command() {
   $items['shunt-enable'] = array(
     'description' => 'Enable one or more shunts.',
     'arguments' => array(
-      'name' => '(optional) The machine name of a shunt to enable, or "all" for all shunts. Omit to interactively choose from a list of available shunts.',
+      'shunt' => 'The machine name of a shunt to enable, or "all" for all shunts.',
     ),
+    'required-arguments' => TRUE,
     'examples' => array(
       'drush shunt-enable all' => 'Enable all shunts.',
       'drush shunt-enable example' => 'Enable the "example" shunt.',
-      'drush shunt-enable' => 'Choose from a list of shunts to enable at the prompt.',
     ),
     'aliases' => array('she'),
   );
@@ -29,12 +29,12 @@ function shunt_drush_command() {
   $items['shunt-disable'] = array(
     'description' => 'Disable one or more shunts.',
     'arguments' => array(
-      'name' => '(optional) The machine name of a shunt to disable, or "all" for all shunts. Omit to interactively choose from a list of available shunts.',
+      'shunt' => 'The machine name of a shunt to disable, or "all" for all shunts.',
     ),
+    'required-arguments' => TRUE,
     'examples' => array(
       'drush shunt-disable all' => 'Disable all shunts.',
       'drush shunt-disable example' => 'Disable the "example" shunt.',
-      'drush shunt-disable' => 'Choose from a list of shunts to disable at the prompt.',
     ),
     'aliases' => array('shd'),
   );
@@ -42,7 +42,7 @@ function shunt_drush_command() {
   $items['shunt-info'] = array(
     'description' => 'Show detailed info for one or more shunts.',
     'arguments' => array(
-      'names' => 'A list of shunt machine names. You can use the wildcard (*) at the end of shunt names to show info for multiple matches. If no argument is provided it will show info for all available shunts.',
+      'shunts' => 'A list of shunt machine names. You can use the wildcard (*) at the end of shunt names to show info for multiple matches. If no argument is provided it will show info for all available shunts.',
     ),
     'examples' => array(
       'drush shunt-info example' => 'Show info for the "example" shunt.',
@@ -95,7 +95,16 @@ function shunt_drush_command() {
  * @see shunt_drush_command()
  */
 function drush_shunt_disable($shunt = NULL) {
-  _shunt_enable_or_disable($shunt, 'disable');
+  _shunt_drush_enable_or_disable($shunt, 'disable');
+}
+
+/**
+ * Command argument complete callback.
+ *
+ * @see shunt_drush_command()
+ */
+function shunt_shunt_disable_complete() {
+  return _shunt_drush_complete_shunts();
 }
 
 /**
@@ -104,7 +113,16 @@ function drush_shunt_disable($shunt = NULL) {
  * @see shunt_drush_command()
  */
 function drush_shunt_enable($shunt = NULL) {
-  _shunt_enable_or_disable($shunt, 'enable');
+  _shunt_drush_enable_or_disable($shunt, 'enable');
+}
+
+/**
+ * Command argument complete callback.
+ *
+ * @see shunt_drush_command()
+ */
+function shunt_shunt_enable_complete() {
+  return _shunt_drush_complete_shunts();
 }
 
 /**
@@ -116,7 +134,7 @@ function drush_shunt_info() {
   $shunt_info = Shunt::getDefinitions();
 
   $args = _convert_csv_to_array(func_get_args());
-  _shunt_expand_shunt_names($args);
+  _shunt_drush_expand_shunt_names($args);
 
   // If no shunts are specified, show all.
   if (count($args) == 0) {
@@ -141,6 +159,15 @@ function drush_shunt_info() {
   }
 
   return $result;
+}
+
+/**
+ * Command argument complete callback.
+ *
+ * @see shunt_drush_command()
+ */
+function shunt_shunt_info_complete() {
+  return _shunt_drush_complete_shunts();
 }
 
 /**
@@ -191,38 +218,44 @@ function drush_shunt_list() {
 }
 
 /**
+ * Gets a list of shunt names for command completion.
+ *
+ * @return array
+ *   An indexed array of available shunt names.
+ */
+function _shunt_drush_complete_shunts() {
+  if (drush_bootstrap_max(DRUSH_BOOTSTRAP_DRUPAL_FULL)) {
+    $shunt_info = Shunt::getDefinitions();
+    $shunt_names = array_keys($shunt_info);
+    return array('values' => $shunt_names);
+  }
+}
+
+/**
  * Handles shunt selection and status operation for enable/disable commands.
  *
- * @param string $selection
- *   The user-supplied command argument. May be the machine name of a shunt,
- *   "all", or NULL.
+ * @param string $args
+ *   The user-supplied command argument. May be the machine name of a shunt or
+ *   "all".
  * @param string $operation
  *   The status value. Accepted values are "enable" and "disable".
  *
  * @see drush_shunt_disable()
  * @see drush_shunt_enable()
  */
-function _shunt_enable_or_disable($selection, $operation) {
+function _shunt_drush_enable_or_disable($args, $operation) {
   // Make sure specified operation is valid.
   $valid_operations = array('enable', 'disable');
   if (!in_array($operation, $valid_operations)) {
     return;
   }
 
-  // Prompt the user to choose a shunt if none is specified.
-  $choice = ($selection) ? $selection : _shunt_prompt_for_shunt_choice();
-
-  // Return if cancelled.
-  if ($choice === FALSE) {
-    return;
-  }
-
   // Prepare the shunt list.
-  if ($choice == 'all') {
+  if ($args == 'all') {
     $shunt_list = array_keys(Shunt::getDefinitions());
   }
   else {
-    $shunt_list = array($choice);
+    $shunt_list = array($args);
   }
 
   // Perform the operation on the selection.
@@ -240,7 +273,7 @@ function _shunt_enable_or_disable($selection, $operation) {
  * @param array $shunts
  *   An indexed array of shunt names, by reference.
  */
-function _shunt_expand_shunt_names(array &$shunts) {
+function _shunt_drush_expand_shunt_names(array &$shunts) {
   $shunt_info = Shunt::getDefinitions();
   foreach ($shunts as $key => $shunt) {
     $wildcard = rtrim($shunt, '*');
@@ -254,26 +287,4 @@ function _shunt_expand_shunt_names(array &$shunts) {
       continue;
     }
   }
-}
-
-/**
- * Prompts the user to choose from a list of available shunts.
- *
- * @return string|false
- *   The value of the option (i.e., the shunt machine name) chosen, or FALSE if
- *   cancelled.
- */
-function _shunt_prompt_for_shunt_choice() {
-  // Populate the option list with available shunts.
-  $shunt_names = array_keys(Shunt::getDefinitions());
-  $options = drupal_map_assoc($shunt_names);
-
-  // Prepend an "all" option.
-  array_unshift($options, array('all' => 'All'));
-
-  $prompt = t('Choose a shunt');
-
-  $choice = drush_choice($options, $prompt);
-
-  return $choice;
 }
