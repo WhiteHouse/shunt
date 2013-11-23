@@ -6,10 +6,43 @@
  */
 
 /**
+ * Implements hook_menu().
+ */
+function shuntexample_menu() {
+  $items = array();
+
+  $items['shuntexample'] = array(
+    'title' => 'Shunt example',
+    'description' => 'An example page demonstrating graceful failure with Shunt module.',
+    'type' => MENU_NORMAL_ITEM,
+    'route_name' => 'shuntexample.hello',
+    'menu_name' => 'main',
+  );
+
+  return $items;
+}
+
+/**
  * Implements hook_shunt_info().
  */
 function shuntexample_shunt_info() {
   return array(
     'shuntexample' => t('An example shunt.'),
+  );
+}
+
+/**
+ * Implements hook_theme().
+ */
+function shuntexample_theme($existing, $type, $theme, $path) {
+  return array(
+    'shuntexample_fail' => array(
+      'render element' => 'content',
+      'template' => 'shuntexample-fail',
+    ),
+    'shuntexample_hello' => array(
+      'render element' => 'content',
+      'template' => 'shuntexample-hello',
+    ),
   );
 }
