@@ -72,7 +72,7 @@ class ShuntConfigForm implements FormInterface {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, array &$form_state) {
-    Shunt::setStatusMultiple($form_state['values']['shunts'], FALSE);
+    Shunt::setStatusMultiple($form_state['values']['shunts']);
   }
 
 }

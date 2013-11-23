@@ -173,17 +173,13 @@ class Shunt {
    *   The machine name of the shunt.
    * @param bool $status
    *   TRUE to enable or FALSE to disable.
-   * @param bool $warn_when_same
-   *   (optional) Whether or not a warning should be issued when refusing to set
-   *   a shunt status because the new status is the same as the old one. TRUE if
-   *   it should or FALSE if it should not. Defaults to TRUE.
    *
    * @return bool
    *   Returns TRUE if the status was changed or FALSE if not.
    *
    * @see Drupal\shunt\Shunt::setStatusMultiple()
    */
-  protected static function setStatus($shunt, $status, $warn_when_same = TRUE) {
+  protected static function setStatus($shunt, $status) {
     // Store arguments for t() reused below.
     $args = array('@name' => $shunt);
 
@@ -200,12 +196,6 @@ class Shunt {
     // and don't invoke hooks unless it is.
     $current_status = self::isEnabled($shunt);
     if ($bool_status === $current_status) {
-      if ($warn_when_same) {
-        $warning_message['enabled'] = t('Shunt "@name" is already enabled.', $args);
-        $warning_message['disabled'] = t('Shunt "@name" is already disabled.', $args);
-        drupal_set_message($warning_message[$bool_status ? 'enabled' : 'disabled'], 'warning');
-      }
-
       return FALSE;
     }
 
@@ -230,17 +220,13 @@ class Shunt {
    *   An array of shunt/status pairs where each key is a shunt machine name and
    *   its corresponding value is the new status value: TRUE for enabled or
    *   FALSE for disabled.
-   * @param bool $warn_when_same
-   *   (optional) Whether or not a warning should be issued when refusing to set
-   *   a shunt status because the new status is the same as the old one. TRUE if
-   *   it should or FALSE if it should not. Defaults to TRUE.
    */
-  public static function setStatusMultiple($statuses, $warn_when_same = TRUE) {
+  public static function setStatusMultiple($statuses) {
     // Iterate over statuses.
     $changes = array();
     foreach ($statuses as $shunt => $status) {
       $bool_status = (bool) $status;
-      $changed = self::setStatus($shunt, (bool) $bool_status, $warn_when_same);
+      $changed = self::setStatus($shunt, (bool) $bool_status);
       if ($changed) {
         $changes[$shunt] = $bool_status ? 'enabled' : 'disabled';
       }
