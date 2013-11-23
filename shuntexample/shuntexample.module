@@ -10,6 +10,6 @@
  */
 function shuntexample_shunt() {
   return array(
-    'shuntexample' => 'An example shunt.',
+    'shuntexample' => t('An example shunt.'),
   );
 }
