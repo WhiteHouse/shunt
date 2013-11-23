@@ -6,9 +6,9 @@
  */
 
 /**
- * Implements hook_shunt().
+ * Implements hook_shunt_info().
  */
-function shuntexample_shunt() {
+function shuntexample_shunt_info() {
   return array(
     'shuntexample' => t('An example shunt.'),
   );

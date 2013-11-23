@@ -31,7 +31,7 @@
  *   An array of shunts. Each shunt item is keyed by its machine name and has a
  *   value of a translated description string.
  */
-function hook_shunt() {
+function hook_shunt_info() {
   return array(
     // It can be helpful to define a "master" shunt that toggles ALL
     // functionality for your module as well as individual shunts for particular

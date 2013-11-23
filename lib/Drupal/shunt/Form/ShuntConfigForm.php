@@ -26,7 +26,7 @@ class ShuntConfigForm implements FormInterface {
    * {@inheritdoc}
    */
   public function buildForm(array $form, array &$form_state) {
-    $shunts = Shunt::getDefinitions();
+    $shunt_info = Shunt::getDefinitions();
 
     // Define table header.
     $header = array(
@@ -37,7 +37,7 @@ class ShuntConfigForm implements FormInterface {
     // Build table rows.
     $options = array();
     $default_values = array();
-    foreach ($shunts as $name => $description) {
+    foreach ($shunt_info as $name => $description) {
       $options[$name] = array(
         'name' => "<strong><label for=\"edit-shunts-{$name}\">{$name}</label></strong>",
         'description' => $description,

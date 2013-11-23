@@ -51,9 +51,9 @@ function shunt_permission() {
 }
 
 /**
- * Implements hook_shunt().
+ * Implements hook_shunt_info().
  */
-function shunt_shunt() {
+function shunt_shunt_info() {
   return array(
     'shunt' => t('The default shunt.'),
   );

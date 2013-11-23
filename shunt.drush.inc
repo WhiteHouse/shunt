@@ -202,8 +202,8 @@ function drush_shunt_list() {
 
   // Build result table.
   $result = array();
-  $shunts = Shunt::getDefinitions();
-  foreach ($shunts as $name => $description) {
+  $shunt_info = Shunt::getDefinitions();
+  foreach ($shunt_info as $name => $description) {
     // Filter by status.
     $status = (Shunt::isEnabled($name)) ? 'enabled' : 'disabled';
     if (!in_array($status, $status_filter)) {

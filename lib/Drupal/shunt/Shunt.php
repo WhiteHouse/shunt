@@ -80,8 +80,8 @@ class Shunt {
       return FALSE;
     }
 
-    $shunts = self::getDefinitions();
-    return array_key_exists($shunt, $shunts);
+    $shunt_info = self::getDefinitions();
+    return array_key_exists($shunt, $shunt_info);
   }
 
   /**
@@ -94,13 +94,13 @@ class Shunt {
    * @throws \Drupal\shunt\ShuntException
    *   Throws an exception if an invalid shunt definition is detected.
    *
-   * @see hook_shunt()
+   * @see hook_shunt_info()
    */
   public static function getDefinitions() {
     $shunts = &drupal_static(__FUNCTION__);
     if (!isset($shunts)) {
       // Get definitions.
-      $definitions = Drupal::moduleHandler()->invokeAll('shunt');
+      $definitions = Drupal::moduleHandler()->invokeAll('shunt_info');
 
       foreach ($definitions as $name => $description) {
         // Reject invalid shunt names.
