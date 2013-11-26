@@ -23,7 +23,7 @@ class Shunt {
    * @see Drupal\shunt\Shunt::enable()
    */
   public static function disable($shunt) {
-    self::disableMultiple(array($shunt));
+    static::disableMultiple(array($shunt));
   }
 
   /**
@@ -37,7 +37,7 @@ class Shunt {
    */
   public static function disableMultiple($shunts) {
     $statuses = array_fill_keys($shunts, FALSE);
-    self::setStatusMultiple($statuses);
+    static::setStatusMultiple($statuses);
   }
 
   /**
@@ -49,7 +49,7 @@ class Shunt {
    * @see Drupal\shunt\Shunt::disable()
    */
   public static function enable($shunt) {
-    self::enableMultiple(array($shunt));
+    static::enableMultiple(array($shunt));
   }
 
   /**
@@ -63,7 +63,7 @@ class Shunt {
    */
   public static function enableMultiple($shunts) {
     $statuses = array_fill_keys($shunts, TRUE);
-    self::setStatusMultiple($statuses);
+    static::setStatusMultiple($statuses);
   }
 
   /**
@@ -80,7 +80,7 @@ class Shunt {
       return FALSE;
     }
 
-    $shunt_info = self::getDefinitions();
+    $shunt_info = static::getDefinitions();
     return array_key_exists($shunt, $shunt_info);
   }
 
@@ -104,7 +104,7 @@ class Shunt {
 
       foreach ($definitions as $name => $description) {
         // Reject invalid shunt names.
-        if (!self::isValidName($name)) {
+        if (!static::isValidName($name)) {
           throw new ShuntException("Invalid shunt name \"{$name}\"");
         }
 
@@ -129,7 +129,7 @@ class Shunt {
    */
   public static function isEnabled($shunt) {
     // A non-existant shunt may be considered to be disabled.
-    if (!self::exists($shunt)) {
+    if (!static::exists($shunt)) {
       return FALSE;
     }
 
@@ -184,7 +184,7 @@ class Shunt {
     $args = array('@name' => $shunt);
 
     // Make sure the shunt exists.
-    if (!self::exists($shunt)) {
+    if (!static::exists($shunt)) {
       drupal_set_message(t('No such shunt "@name".', $args), 'error');
       return FALSE;
     }
@@ -194,7 +194,7 @@ class Shunt {
 
     // Find out if the new status is actually different from the current one
     // and don't invoke hooks unless it is.
-    $current_status = self::isEnabled($shunt);
+    $current_status = static::isEnabled($shunt);
     if ($bool_status === $current_status) {
       return FALSE;
     }
@@ -226,7 +226,7 @@ class Shunt {
     $changes = array();
     foreach ($statuses as $shunt => $status) {
       $bool_status = (bool) $status;
-      $changed = self::setStatus($shunt, (bool) $bool_status);
+      $changed = static::setStatus($shunt, (bool) $bool_status);
       if ($changed) {
         $changes[$shunt] = $bool_status ? 'enabled' : 'disabled';
       }
