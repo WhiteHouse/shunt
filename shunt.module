@@ -46,6 +46,7 @@ function shunt_permission() {
     'administer shunts' => array(
       'title' => t('Administer shunts'),
       'description' => t('Enable and disable shunts.'),
+      'restrict access' => TRUE,
     ),
   );
 }
