@@ -20,7 +20,7 @@
  *
  * Shunt machine names can be any valid PHP label except for "all". They should
  * be prefixed with the name of the module that defines them in order to avoid
- * namespace conflicts. Beyond that, names have have no intrinsic meaning--the
+ * namespace conflicts. Beyond that, names have no intrinsic meaning--the
  * effect a given shunt has is entirely dependent on the application code that
  * uses it.
  *
@@ -61,10 +61,10 @@ function hook_shunt_post_change($shunt, $change) {
 
     // React differently based on operation.
     if ($change == 'enabled') {
-      drupal_set_message(t('You just enabled "example"!'));
+      drupal_set_message(t('You just enabled "example" shunt!'));
     }
     else {
-      drupal_set_message(t('You just disabled "example"!'));
+      drupal_set_message(t('You just disabled "example" shunt!'));
     }
   }
 
