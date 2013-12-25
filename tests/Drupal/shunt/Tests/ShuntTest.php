@@ -16,6 +16,17 @@ use Drupal\shunt\Shunt;
 class ShuntTest extends UnitTestCase {
 
   /**
+   * {@inheritdoc}
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Shunt',
+      'description' => 'Tests the Shunt module.',
+      'group' => 'Shunt',
+    );
+  }
+
+  /**
    * Tests shunt name validation.
    *
    * @see \Drupal\shunt\Shunt::isValidName()
