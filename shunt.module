@@ -23,19 +23,17 @@ function shunt_is_enabled($shunt = 'shunt') {
 }
 
 /**
- * Implements hook_menu().
+ * Implements hook_menu_link_defaults().
  */
-function shunt_menu() {
-  $items = array();
-
-  $items['admin/config/system/shunts'] = array(
-    'title' => 'Shunts',
+function shunt_menu_link_defaults() {
+  $links['shunt.config'] = array(
+    'link_title' => 'Shunts',
     'description' => 'Configure shunts to make site functionality fail gracefully.',
-    'type' => MENU_NORMAL_ITEM,
     'route_name' => 'shunt.config',
+    'parent' => 'system.admin.config.development',
   );
 
-  return $items;
+  return $links;
 }
 
 /**

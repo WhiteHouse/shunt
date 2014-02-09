@@ -1,5 +1,5 @@
 shunt.config:
-  path: '/admin/config/system/shunts'
+  path: '/admin/config/development/shunts'
   defaults:
     _title: Shunts
     _form: '\Drupal\shunt\Form\ShuntConfigForm'
