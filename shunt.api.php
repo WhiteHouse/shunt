@@ -111,8 +111,9 @@ function hook_shunt_post_changeset($changes) {
  */
 function shunt_demonstrate_shunt_use() {
   // Get the state of the shunts.
-  $master_shunt_is_enabled = (module_exists('shunt') && shunt_is_enabled()) ? TRUE : FALSE;
-  $specific_shunt_is_enabled = (module_exists('shunt') && shunt_is_enabled('example')) ? TRUE : FALSE;
+  $module_exists = \Drupal::moduleHandler()->moduleExists('shunt');
+  $master_shunt_is_enabled = ($module_exists && shunt_is_enabled()) ? TRUE : FALSE;
+  $specific_shunt_is_enabled = ($module_exists && shunt_is_enabled('example')) ? TRUE : FALSE;
 
   // Depend on both shunts.
   if ($master_shunt_is_enabled || $specific_shunt_is_enabled) {
