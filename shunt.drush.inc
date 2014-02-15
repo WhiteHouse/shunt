@@ -318,7 +318,7 @@ function _shunt_drush_parse_shunt_list(array $raw_args) {
   $unique_args = array_unique($args_array);
 
   // Discard non-existent shunts.
-  $shunt_list = [];
+  $shunt_list = array();
   foreach ($unique_args as $name) {
     if (Shunt::exists($name)) {
       $shunt_list[] = $name;
