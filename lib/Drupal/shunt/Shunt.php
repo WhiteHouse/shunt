@@ -8,6 +8,7 @@
 namespace Drupal\shunt;
 
 use Drupal;
+use Drupal\Component\Utility\String;
 
 /**
  * Defines the shunt object.
@@ -109,7 +110,7 @@ class Shunt {
         }
 
         // Sanitize descriptions.
-        $definitions[$name] = check_plain($description);
+        $definitions[$name] = String::checkPlain($description);
       }
 
       // Sort by machine name.
