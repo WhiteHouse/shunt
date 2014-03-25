@@ -29,22 +29,42 @@ class ShuntTest extends UnitTestCase {
   /**
    * Tests shunt name validation.
    *
+   * @dataProvider providerIsValidName
+   *
+   * @param string $expected
+   *   The expected output from the method.
+   * @param string $name
+   *   The name to provide to Shunt::isValidName().
+   * @param string $message
+   *   The message to provide as output for the test.
+   *
    * @see \Drupal\shunt\Shunt::isValidName()
    */
-  public function testIsValidName() {
+  public function testIsValidName($expected, $name, $message) {
+    $this->assertEquals($expected, Shunt::isValidName($name), $message);
+  }
+
+  /**
+   * Data provider for testIsValidName().
+   *
+   * @see testIsValidName()
+   */
+  public function providerIsValidName() {
     // Valid names.
-    $this->assertTrue(Shunt::isValidName('shunt'), 'Did not accept the default shunt name.');
-    $this->assertTrue(Shunt::isValidName('_shunt'), 'Did not accept a shunt name with a leading underscore.');
-    $this->assertTrue(Shunt::isValidName('shunt1'), 'Did not accept a shunt name with a digit.');
-    $this->assertTrue(Shunt::isValidName('shünt'), 'Did not accept a shunt name with a valid Unicode character.');
-    $this->assertTrue(Shunt::isValidName('_'), 'Did not accept a single underscore as a shunt name.');
+    $tests[] = array(TRUE, 'shunt', 'Did not accept the default shunt name.');
+    $tests[] = array(TRUE, '_shunt', 'Did not accept a shunt name with a leading underscore.');
+    $tests[] = array(TRUE, 'shunt1', 'Did not accept a shunt name with a digit.');
+    $tests[] = array(TRUE, 'shünt', 'Did not accept a shunt name with a valid Unicode character.');
+    $tests[] = array(TRUE, '_', 'Did not accept a single underscore as a shunt name.');
 
     // Invalid names.
-    $this->assertFalse(Shunt::isValidName('1shunt'), 'Did not reject a shunt name beginning with a digit.');
-    $this->assertFalse(Shunt::isValidName('$hunt'), 'Did not reject a shunt name with an illegal character.');
-    $this->assertFalse(Shunt::isValidName('all'), 'Did not reject the reserved shunt name "all".');
-    $this->assertFalse(Shunt::isValidName(''), 'Did not reject a zero length shunt name.');
-    $this->assertFalse(Shunt::isValidName(0), 'Did not reject a non-string shunt name.');
+    $tests[] = array(FALSE, '1shunt', 'Did not reject a shunt name beginning with a digit.');
+    $tests[] = array(FALSE, '$hunt', 'Did not reject a shunt name with an illegal character.');
+    $tests[] = array(FALSE, 'all', 'Did not reject the reserved shunt name "all".');
+    $tests[] = array(FALSE, '', 'Did not reject a zero length shunt name.');
+    $tests[] = array(FALSE, 0, 'Did not reject a non-string shunt name.');
+
+    return $tests;
   }
 
 }
