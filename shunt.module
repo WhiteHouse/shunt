@@ -30,7 +30,7 @@ function shunt_menu_link_defaults() {
     'link_title' => 'Shunts',
     'description' => 'Configure shunts to make site functionality fail gracefully.',
     'route_name' => 'shunt.config',
-    'parent' => 'system.admin.config.development',
+    'parent' => 'system.admin_config_development',
   );
 
   return $links;
