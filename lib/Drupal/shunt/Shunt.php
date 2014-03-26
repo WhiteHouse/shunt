@@ -98,8 +98,8 @@ class Shunt {
    * @see hook_shunt_info()
    */
   public static function getDefinitions() {
-    $shunts = &drupal_static(__FUNCTION__);
-    if (!isset($shunts)) {
+    $definitions = &drupal_static(__FUNCTION__);
+    if (!isset($definitions)) {
       // Get definitions.
       $definitions = Drupal::moduleHandler()->invokeAll('shunt_info');
 
