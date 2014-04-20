@@ -5,7 +5,7 @@
  * Drush commands for the Shunt module.
  */
 
-use Drupal\shunt\Shunt;
+use Drupal\shunt\ShuntHandler;
 
 /**
  * Implements hook_drush_command().
@@ -121,7 +121,7 @@ function drush_shunt_disable() {
     return drush_user_abort();
   }
 
-  Shunt::disableMultiple($shunt_list);
+  ShuntHandler::disableMultiple($shunt_list);
 }
 
 /**
@@ -162,7 +162,7 @@ function drush_shunt_enable() {
     return drush_user_abort();
   }
 
-  Shunt::enableMultiple($shunt_list);
+  ShuntHandler::enableMultiple($shunt_list);
 }
 
 /**
@@ -180,7 +180,7 @@ function shunt_shunt_enable_complete() {
  * @see shunt_drush_command()
  */
 function drush_shunt_info() {
-  $shunt_info = Shunt::getDefinitions();
+  $shunt_info = ShuntHandler::getDefinitions();
 
   $result = array();
 
@@ -189,7 +189,7 @@ function drush_shunt_info() {
     $result[$shunt] = array(
       'name' => $shunt,
       'description' => $shunt_info[$shunt],
-      'status' => Shunt::isEnabled($shunt) ? 'enabled' : 'disabled',
+      'status' => ShuntHandler::isEnabled($shunt) ? 'enabled' : 'disabled',
     );
   }
 
@@ -233,10 +233,10 @@ function drush_shunt_list() {
 
   // Build result table.
   $result = array();
-  $shunt_info = Shunt::getDefinitions();
+  $shunt_info = ShuntHandler::getDefinitions();
   foreach ($shunt_info as $name => $description) {
     // Filter by status.
-    $status = (Shunt::isEnabled($name)) ? 'enabled' : 'disabled';
+    $status = (ShuntHandler::isEnabled($name)) ? 'enabled' : 'disabled';
     if (!in_array($status, $status_filter)) {
       continue;
     }
@@ -260,7 +260,7 @@ function drush_shunt_list() {
  */
 function _shunt_drush_complete_shunts() {
   if (drush_bootstrap_max(DRUSH_BOOTSTRAP_DRUPAL_FULL)) {
-    $shunt_info = Shunt::getDefinitions();
+    $shunt_info = ShuntHandler::getDefinitions();
     $shunt_names = array_keys($shunt_info);
     return array('values' => $shunt_names);
   }
@@ -277,7 +277,7 @@ function _shunt_drush_complete_shunts() {
  *   An indexed array of shunt names, by reference.
  */
 function _shunt_drush_expand_shunt_names(array &$shunts) {
-  $shunt_info = Shunt::getDefinitions();
+  $shunt_info = ShuntHandler::getDefinitions();
   foreach ($shunts as $key => $shunt) {
     $wildcard = rtrim($shunt, '*');
     if ($wildcard !== $shunt) {
@@ -308,7 +308,7 @@ function _shunt_drush_parse_shunt_list(array $raw_args) {
 
   // The "all" keyword supercedes all other arguments. Return early.
   if (in_array('all', $args_array)) {
-    return array_keys(Shunt::getDefinitions());
+    return array_keys(ShuntHandler::getDefinitions());
   }
 
   // Expand wildcards.
@@ -320,7 +320,7 @@ function _shunt_drush_parse_shunt_list(array $raw_args) {
   // Discard non-existent shunts.
   $shunt_list = array();
   foreach ($unique_args as $name) {
-    if (Shunt::exists($name)) {
+    if (ShuntHandler::exists($name)) {
       $shunt_list[] = $name;
     }
     else {

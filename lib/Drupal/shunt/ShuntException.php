@@ -8,6 +8,6 @@
 namespace Drupal\shunt;
 
 /**
- * Defines an exception class for \Drupal\shunt\Shunt.
+ * Defines an exception class for Shunt module.
  */
 class ShuntException extends \Exception {}

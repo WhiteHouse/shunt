@@ -2,26 +2,26 @@
 
 /**
  * @file
- * Contains \Drupal\shunt\Tests\ShuntTest.
+ * Contains \Drupal\shunt\Tests\ShuntHandlerTest.
  */
 
 namespace Drupal\shunt\Tests;
 
 use Drupal\Tests\UnitTestCase;
-use Drupal\shunt\Shunt;
+use Drupal\shunt\ShuntHandler;
 
 /**
- * Tests the Shunt class.
+ * Tests the ShuntHandler class.
  */
-class ShuntTest extends UnitTestCase {
+class ShuntHandlerTest extends UnitTestCase {
 
   /**
    * {@inheritdoc}
    */
   public static function getInfo() {
     return array(
-      'name' => 'Shunt',
-      'description' => 'Tests the Shunt module.',
+      'name' => 'ShuntHandler',
+      'description' => 'Tests the ShuntHandler class.',
       'group' => 'Shunt',
     );
   }
@@ -34,14 +34,14 @@ class ShuntTest extends UnitTestCase {
    * @param string $expected
    *   The expected output from the method.
    * @param string $name
-   *   The name to provide to Shunt::isValidName().
+   *   The name to provide to ShuntHandler::isValidName().
    * @param string $message
    *   The message to provide as output for the test.
    *
-   * @see \Drupal\shunt\Shunt::isValidName()
+   * @see \Drupal\shunt\ShuntHandler::isValidName()
    */
   public function testIsValidName($expected, $name, $message) {
-    $this->assertEquals($expected, Shunt::isValidName($name), $message);
+    $this->assertEquals($expected, ShuntHandler::isValidName($name), $message);
   }
 
   /**

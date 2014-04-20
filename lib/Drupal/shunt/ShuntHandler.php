@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\shunt\Shunt.
+ * Contains \Drupal\shunt\ShuntHandler.
  */
 
 namespace Drupal\shunt;
@@ -11,30 +11,19 @@ use Drupal;
 use Drupal\Component\Utility\String;
 
 /**
- * Defines the shunt object.
+ * Defines a class for managing shunts.
  */
-class Shunt {
+class ShuntHandler implements ShuntHandlerInterface {
 
   /**
-   * Disables a given shunt.
-   *
-   * @param string $shunt
-   *   The machine name of the shunt to disable.
-   *
-   * @see Drupal\shunt\Shunt::enable()
+   * {@inheritdoc}
    */
   public static function disable($shunt) {
     static::disableMultiple(array($shunt));
   }
 
   /**
-   * Disables a given list of shunts.
-   *
-   * @param string $shunts
-   *   An indexed array of the machine names of the shunts to disable.
-   *
-   * @see Drupal\shunt\Shunt::disable()
-   * @see Drupal\shunt\Shunt::enableMultiple()
+   * {@inheritdoc}
    */
   public static function disableMultiple($shunts) {
     $statuses = array_fill_keys($shunts, FALSE);
@@ -42,25 +31,14 @@ class Shunt {
   }
 
   /**
-   * Enables a given shunt.
-   *
-   * @param string $shunt
-   *   The machine name of the shunt to enable.
-   *
-   * @see Drupal\shunt\Shunt::disable()
+   * {@inheritdoc}
    */
   public static function enable($shunt) {
     static::enableMultiple(array($shunt));
   }
 
   /**
-   * Enables a given list of shunts.
-   *
-   * @param string $shunts
-   *   An indexed array of the machine names of the shunts to enable.
-   *
-   * @see Drupal\shunt\Shunt::enable()
-   * @see Drupal\shunt\Shunt::disableMultiple()
+   * {@inheritdoc}
    */
   public static function enableMultiple($shunts) {
     $statuses = array_fill_keys($shunts, TRUE);
@@ -68,13 +46,7 @@ class Shunt {
   }
 
   /**
-   * Determines whether a given shunt exists.
-   *
-   * @param string $shunt
-   *   The machine name of the shunt.
-   *
-   * @return bool
-   *   Returns TRUE if the shunt exists or FALSE if it doesn't.
+   * {@inheritdoc}
    */
   public static function exists($shunt) {
     if (!static::isValidName($shunt)) {
@@ -86,16 +58,7 @@ class Shunt {
   }
 
   /**
-   * Gets an array of available shunt definitions.
-   *
-   * @return array
-   *   An array of shunts. Each shunt item is keyed by its machine name and has
-   *   a value of a translated description string.
-   *
-   * @throws \Drupal\shunt\ShuntException
-   *   Throws an exception if an invalid shunt definition is detected.
-   *
-   * @see hook_shunt_info()
+   * {@inheritdoc}
    */
   public static function getDefinitions() {
     $definitions = &drupal_static(__FUNCTION__);
@@ -120,13 +83,7 @@ class Shunt {
   }
 
   /**
-   * Determines whether a given shunt is enabled or not.
-   *
-   * @param string $shunt
-   *   The machine name of the shunt.
-   *
-   * @return bool
-   *   Returns TRUE if the shunt is enabled or FALSE if it is disabled.
+   * {@inheritdoc}
    */
   public static function isEnabled($shunt) {
     // A non-existant shunt may be considered to be disabled.
@@ -168,7 +125,8 @@ class Shunt {
    * Sets the status of a given shunt.
    *
    * This is an internal-only method. Consumer code should use
-   * Drupal\shunt\Shunt::enable() or Drupal\shunt\Shunt::disable() instead.
+   * Drupal\shunt\ShuntHandler::enable() or Drupal\shunt\ShuntHandler::disable()
+   * instead.
    *
    * @param string $shunt
    *   The machine name of the shunt.
@@ -177,8 +135,6 @@ class Shunt {
    *
    * @return bool
    *   Returns TRUE if the status was changed or FALSE if not.
-   *
-   * @see Drupal\shunt\Shunt::setStatusMultiple()
    */
   protected static function setStatus($shunt, $status) {
     // Store arguments for t() reused below.
@@ -215,12 +171,7 @@ class Shunt {
   }
 
   /**
-   * Sets a given set of shunt/status pairs.
-   *
-   * @param array $statuses
-   *   An array of shunt/status pairs where each key is a shunt machine name and
-   *   its corresponding value is the new status value: TRUE for enabled or
-   *   FALSE for disabled.
+   * {@inheritdoc}
    */
   public static function setStatusMultiple($statuses) {
     // Iterate over statuses.

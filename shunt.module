@@ -7,7 +7,7 @@
  * Enable your site to fail gracefully under strain.
  */
 
-Use Drupal\shunt\Shunt;
+Use Drupal\shunt\ShuntHandler;
 
 /**
  * Determines whether a given shunt is enabled or not.
@@ -19,7 +19,7 @@ Use Drupal\shunt\Shunt;
  *   Returns TRUE if the shunt is enabled or FALSE if it is disabled.
  */
 function shunt_is_enabled($shunt = 'shunt') {
-  return Shunt::isEnabled($shunt);
+  return ShuntHandler::isEnabled($shunt);
 }
 
 /**
