@@ -7,9 +7,6 @@
 
 namespace Drupal\shunt;
 
-use Drupal;
-use Drupal\Component\Utility\String;
-
 /**
  * Defines a class for managing shunts.
  */
@@ -49,7 +46,7 @@ class ShuntHandler implements ShuntHandlerInterface {
    * {@inheritdoc}
    */
   public static function exists($shunt) {
-    if (!static::isValidName($shunt)) {
+    if (!Shunt::isValidName($shunt)) {
       return FALSE;
     }
 
@@ -64,16 +61,11 @@ class ShuntHandler implements ShuntHandlerInterface {
     $definitions = &drupal_static(__FUNCTION__);
     if (!isset($definitions)) {
       // Get definitions.
-      $definitions = Drupal::moduleHandler()->invokeAll('shunt_info');
+      $definitions = \Drupal::moduleHandler()->invokeAll('shunt_info');
 
       foreach ($definitions as $name => $description) {
-        // Reject invalid shunt names.
-        if (!static::isValidName($name)) {
-          throw new ShuntException("Invalid shunt name \"{$name}\"");
-        }
-
-        // Sanitize descriptions.
-        $definitions[$name] = String::checkPlain($description);
+        $shunt = new Shunt($name, $description);
+        $definitions[$shunt->getName()] = $shunt->getDescription();
       }
 
       // Sort by machine name.
@@ -86,39 +78,12 @@ class ShuntHandler implements ShuntHandlerInterface {
    * {@inheritdoc}
    */
   public static function isEnabled($shunt) {
-    // A non-existant shunt may be considered to be disabled.
+    // A non-existent shunt may be considered to be disabled.
     if (!static::exists($shunt)) {
       return FALSE;
     }
 
-    return Drupal::state()->get("shunt.{$shunt}", FALSE);
-  }
-
-  /**
-   * Determines whether a given shunt name is valid or not.
-   *
-   * Any valid PHP label is a valid shunt name--except for "all", which is
-   * reserved for use with Drush.
-   *
-   * @param string $name
-   *   The name to test.
-   *
-   * @return bool
-   *   Returns TRUE if the given name is valid or FALSE if it is not.
-   */
-  public static function isValidName($name) {
-    if (!is_string($name)) {
-      return FALSE;
-    }
-
-    $reserved_words = array('all');
-    if (in_array($name, $reserved_words)) {
-      return FALSE;
-    }
-
-    // @see http://php.net/manual/en/language.variables.basics.php
-    $pattern = '/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/';
-    return (bool) preg_match($pattern, $name);
+    return \Drupal::state()->get("shunt.{$shunt}", FALSE);
   }
 
   /**
@@ -157,7 +122,7 @@ class ShuntHandler implements ShuntHandlerInterface {
     }
 
     // Set the status.
-    Drupal::state()->set("shunt.{$shunt}", $bool_status);
+    \Drupal::state()->set("shunt.{$shunt}", $bool_status);
 
     // Report success.
     $success_message['enabled'] = t('Shunt "@name" has been enabled.', $args);
@@ -165,7 +130,7 @@ class ShuntHandler implements ShuntHandlerInterface {
     drupal_set_message($success_message[$bool_status ? 'enabled' : 'disabled']);
 
     $change = $bool_status ? 'enabled' : 'disabled';
-    Drupal::moduleHandler()->invokeAll('shunt_post_change', array($shunt, $change));
+    \Drupal::moduleHandler()->invokeAll('shunt_post_change', array($shunt, $change));
 
     return TRUE;
   }
@@ -186,7 +151,7 @@ class ShuntHandler implements ShuntHandlerInterface {
 
     // Only invoke hooks if changes actually took place.
     if (!empty($changes)) {
-      Drupal::moduleHandler()->invokeAll('shunt_post_changeset', array($changes));
+      \Drupal::moduleHandler()->invokeAll('shunt_post_changeset', array($changes));
     }
   }
 
