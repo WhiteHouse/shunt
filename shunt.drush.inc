@@ -99,10 +99,11 @@ function shunt_drush_command() {
  */
 function drush_shunt_disable() {
   $shunt_list = _shunt_drush_parse_shunt_list(func_get_args());
+  $shunt_handler = \Drupal::service('shunt.handler');
 
   // Discard shunts that are already disabled.
   foreach ($shunt_list as $key => $name) {
-    if (!shunt_is_enabled($name)) {
+    if (!$shunt_handler->isEnabled($name)) {
       drush_log(dt('Shunt "!name" is already disabled.', array(
         '!name' => $name,
       )), 'ok');
@@ -121,7 +122,7 @@ function drush_shunt_disable() {
     return drush_user_abort();
   }
 
-  ShuntHandler::disableMultiple($shunt_list);
+  $shunt_handler->disableMultiple($shunt_list);
 }
 
 /**
@@ -140,10 +141,11 @@ function shunt_shunt_disable_complete() {
  */
 function drush_shunt_enable() {
   $shunt_list = _shunt_drush_parse_shunt_list(func_get_args());
+  $shunt_handler = \Drupal::service('shunt.handler');
 
   // Discard shunts that are already enabled.
   foreach ($shunt_list as $key => $name) {
-    if (shunt_is_enabled($name)) {
+    if ($shunt_handler->isEnabled($name)) {
       drush_log(dt('Shunt "!name" is already enabled.', array(
         '!name' => $name,
       )), 'ok');
@@ -162,7 +164,7 @@ function drush_shunt_enable() {
     return drush_user_abort();
   }
 
-  ShuntHandler::enableMultiple($shunt_list);
+  $shunt_handler->enableMultiple($shunt_list);
 }
 
 /**
@@ -180,7 +182,8 @@ function shunt_shunt_enable_complete() {
  * @see shunt_drush_command()
  */
 function drush_shunt_info() {
-  $shunt_info = ShuntHandler::getDefinitions();
+  $shunt_handler = \Drupal::service('shunt.handler');
+  $shunt_info = $shunt_handler->getDefinitions();
 
   $result = array();
 
@@ -189,7 +192,7 @@ function drush_shunt_info() {
     $result[$shunt] = array(
       'name' => $shunt,
       'description' => $shunt_info[$shunt],
-      'status' => ShuntHandler::isEnabled($shunt) ? 'enabled' : 'disabled',
+      'status' => $shunt_handler->isEnabled($shunt) ? 'enabled' : 'disabled',
     );
   }
 
@@ -233,10 +236,11 @@ function drush_shunt_list() {
 
   // Build result table.
   $result = array();
-  $shunt_info = ShuntHandler::getDefinitions();
+  $shunt_handler = \Drupal::service('shunt.handler');
+  $shunt_info = $shunt_handler->getDefinitions();
   foreach ($shunt_info as $name => $description) {
     // Filter by status.
-    $status = (ShuntHandler::isEnabled($name)) ? 'enabled' : 'disabled';
+    $status = ($shunt_handler->isEnabled($name)) ? 'enabled' : 'disabled';
     if (!in_array($status, $status_filter)) {
       continue;
     }
@@ -260,7 +264,7 @@ function drush_shunt_list() {
  */
 function _shunt_drush_complete_shunts() {
   if (drush_bootstrap_max(DRUSH_BOOTSTRAP_DRUPAL_FULL)) {
-    $shunt_info = ShuntHandler::getDefinitions();
+    $shunt_info = \Drupal::service('shunt.handler')->getDefinitions();
     $shunt_names = array_keys($shunt_info);
     return array('values' => $shunt_names);
   }
@@ -277,7 +281,7 @@ function _shunt_drush_complete_shunts() {
  *   An indexed array of shunt names, by reference.
  */
 function _shunt_drush_expand_shunt_names(array &$shunts) {
-  $shunt_info = ShuntHandler::getDefinitions();
+  $shunt_info = \Drupal::service('shunt.handler')->getDefinitions();
   foreach ($shunts as $key => $shunt) {
     $wildcard = rtrim($shunt, '*');
     if ($wildcard !== $shunt) {
@@ -306,9 +310,11 @@ function _shunt_drush_parse_shunt_list(array $raw_args) {
   // Convert comma separated values.
   $args_array = _convert_csv_to_array($raw_args);
 
-  // The "all" keyword supercedes all other arguments. Return early.
+  $shunt_handler = \Drupal::service('shunt.handler');
+
+  // The "all" keyword supersedes all other arguments. Return early.
   if (in_array('all', $args_array)) {
-    return array_keys(ShuntHandler::getDefinitions());
+    return array_keys($shunt_handler->getDefinitions());
   }
 
   // Expand wildcards.
@@ -320,7 +326,7 @@ function _shunt_drush_parse_shunt_list(array $raw_args) {
   // Discard non-existent shunts.
   $shunt_list = array();
   foreach ($unique_args as $name) {
-    if (ShuntHandler::exists($name)) {
+    if ($shunt_handler->exists($name)) {
       $shunt_list[] = $name;
     }
     else {

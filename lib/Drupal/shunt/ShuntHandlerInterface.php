@@ -7,10 +7,26 @@
 
 namespace Drupal\shunt;
 
+use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\State\StateInterface;
+use Drupal\Core\StringTranslation\TranslationInterface;
+
 /**
  * An interface for classes that manage shunts.
  */
 interface ShuntHandlerInterface {
+
+  /**
+   * Constructs a ShuntHandler object.
+   *
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   *   The module handler.
+   * @param \Drupal\Core\State\StateInterface $state
+   *   The state key/value store.
+   * @param \Drupal\Core\StringTranslation\TranslationInterface $translation_manager
+   *   The translation manager.
+   */
+  public function __construct(ModuleHandlerInterface $module_handler, StateInterface $state, TranslationInterface $translation_manager);
 
   /**
    * Disables a given shunt.
@@ -18,7 +34,7 @@ interface ShuntHandlerInterface {
    * @param string $shunt
    *   The machine name of the shunt to disable.
    */
-  public static function disable($shunt);
+  public function disable($shunt);
 
   /**
    * Disables a given list of shunts.
@@ -26,7 +42,7 @@ interface ShuntHandlerInterface {
    * @param string $shunts
    *   An indexed array of the machine names of the shunts to disable.
    */
-  public static function disableMultiple($shunts);
+  public function disableMultiple($shunts);
 
   /**
    * Enables a given shunt.
@@ -36,7 +52,7 @@ interface ShuntHandlerInterface {
    *
    * @see Drupal\shunt\ShuntHandler::disable()
    */
-  public static function enable($shunt);
+  public function enable($shunt);
 
   /**
    * Enables a given list of shunts.
@@ -44,7 +60,7 @@ interface ShuntHandlerInterface {
    * @param string $shunts
    *   An indexed array of the machine names of the shunts to enable.
    */
-  public static function enableMultiple($shunts);
+  public function enableMultiple($shunts);
 
   /**
    * Determines whether a given shunt exists.
@@ -55,7 +71,7 @@ interface ShuntHandlerInterface {
    * @return bool
    *   Returns TRUE if the shunt exists or FALSE if it doesn't.
    */
-  public static function exists($shunt);
+  public function exists($shunt);
 
   /**
    * Gets an array of available shunt definitions.
@@ -66,7 +82,7 @@ interface ShuntHandlerInterface {
    *
    * @see hook_shunt_info()
    */
-  public static function getDefinitions();
+  public function getDefinitions();
 
   /**
    * Determines whether a given shunt is enabled or not.
@@ -77,7 +93,7 @@ interface ShuntHandlerInterface {
    * @return bool
    *   Returns TRUE if the shunt is enabled or FALSE if it is disabled.
    */
-  public static function isEnabled($shunt);
+  public function isEnabled($shunt);
 
   /**
    * Sets a given set of shunt/status pairs.
@@ -87,6 +103,6 @@ interface ShuntHandlerInterface {
    *   its corresponding value is the new status value: TRUE for enabled or
    *   FALSE for disabled.
    */
-  public static function setStatusMultiple($statuses);
+  public function setStatusMultiple($statuses);
 
 }

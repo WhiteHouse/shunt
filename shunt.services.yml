@@ -1,0 +1,4 @@
+services:
+  shunt.handler:
+    class: Drupal\shunt\ShuntHandler
+    arguments: ['@module_handler', '@state', '@string_translation']

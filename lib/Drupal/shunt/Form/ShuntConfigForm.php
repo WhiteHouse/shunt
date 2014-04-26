@@ -8,7 +8,6 @@
 namespace Drupal\shunt\Form;
 
 use Drupal\Core\Form\FormInterface;
-use Drupal\shunt\ShuntHandler;
 
 /**
  * Provides a form for configuring available shunts.
@@ -26,7 +25,8 @@ class ShuntConfigForm implements FormInterface {
    * {@inheritdoc}
    */
   public function buildForm(array $form, array &$form_state) {
-    $shunt_info = ShuntHandler::getDefinitions();
+    $shunt_handler = \Drupal::service('shunt.handler');
+    $shunt_info = $shunt_handler->getDefinitions();
 
     // Define table header.
     $header = array(
@@ -42,7 +42,7 @@ class ShuntConfigForm implements FormInterface {
         'name' => "<strong><label for=\"edit-shunts-{$name}\">{$name}</label></strong>",
         'description' => $description,
       );
-      $default_values[$name] = ShuntHandler::isEnabled($name);
+      $default_values[$name] = $shunt_handler->isEnabled($name);
     }
 
     // Compile table.
@@ -72,7 +72,7 @@ class ShuntConfigForm implements FormInterface {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, array &$form_state) {
-    ShuntHandler::setStatusMultiple($form_state['values']['shunts']);
+    \Drupal::service('shunt.handler')->setStatusMultiple($form_state['values']['shunts']);
   }
 
 }

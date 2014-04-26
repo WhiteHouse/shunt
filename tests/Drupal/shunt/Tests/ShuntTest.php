@@ -7,11 +7,15 @@
 
 namespace Drupal\shunt\Tests;
 
-use Drupal\Tests\UnitTestCase;
 use Drupal\shunt\Shunt;
+use Drupal\Tests\UnitTestCase;
 
 /**
  * Tests the Shunt class.
+ *
+ * @group Shunt
+ *
+ * @coversDefaultClass \Drupal\shunt\Shunt
  */
 class ShuntTest extends UnitTestCase {
 

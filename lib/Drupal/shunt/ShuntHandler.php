@@ -7,61 +7,95 @@
 
 namespace Drupal\shunt;
 
+use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\State\StateInterface;
+use Drupal\Core\StringTranslation\TranslationInterface;
+
 /**
  * Defines a class for managing shunts.
  */
 class ShuntHandler implements ShuntHandlerInterface {
 
   /**
+   * The module handler.
+   *
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   */
+  protected $moduleHandler;
+
+  /**
+   * The state key/value store.
+   *
+   * @var \Drupal\Core\State\StateInterface
+   */
+  protected $state;
+
+  /**
+   * The translation manager.
+   *
+   * @var \Drupal\Core\StringTranslation\TranslationInterface
+   */
+  protected $translationManager;
+
+  /**
    * {@inheritdoc}
    */
-  public static function disable($shunt) {
-    static::disableMultiple(array($shunt));
+  public function __construct(ModuleHandlerInterface $module_handler, StateInterface $state, TranslationInterface $translation_manager) {
+    $this->moduleHandler = $module_handler;
+    $this->state = $state;
+    $this->translationManager = $translation_manager;
   }
 
   /**
    * {@inheritdoc}
    */
-  public static function disableMultiple($shunts) {
+  public function disable($shunt) {
+    $this->disableMultiple(array($shunt));
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function disableMultiple($shunts) {
     $statuses = array_fill_keys($shunts, FALSE);
-    static::setStatusMultiple($statuses);
+    $this->setStatusMultiple($statuses);
   }
 
   /**
    * {@inheritdoc}
    */
-  public static function enable($shunt) {
-    static::enableMultiple(array($shunt));
+  public function enable($shunt) {
+    $this->enableMultiple(array($shunt));
   }
 
   /**
    * {@inheritdoc}
    */
-  public static function enableMultiple($shunts) {
+  public function enableMultiple($shunts) {
     $statuses = array_fill_keys($shunts, TRUE);
-    static::setStatusMultiple($statuses);
+    $this->setStatusMultiple($statuses);
   }
 
   /**
    * {@inheritdoc}
    */
-  public static function exists($shunt) {
+  public function exists($shunt) {
     if (!Shunt::isValidName($shunt)) {
       return FALSE;
     }
 
-    $shunt_info = static::getDefinitions();
+    $shunt_info = $this->getDefinitions();
     return array_key_exists($shunt, $shunt_info);
   }
 
   /**
    * {@inheritdoc}
    */
-  public static function getDefinitions() {
+  public function getDefinitions() {
     $definitions = &drupal_static(__FUNCTION__);
     if (!isset($definitions)) {
       // Get definitions.
-      $definitions = \Drupal::moduleHandler()->invokeAll('shunt_info');
+      $definitions = $this->moduleHandler->invokeAll('shunt_info');
 
       foreach ($definitions as $name => $description) {
         $shunt = new Shunt($name, $description);
@@ -77,13 +111,13 @@ class ShuntHandler implements ShuntHandlerInterface {
   /**
    * {@inheritdoc}
    */
-  public static function isEnabled($shunt) {
+  public function isEnabled($shunt) {
     // A non-existent shunt may be considered to be disabled.
-    if (!static::exists($shunt)) {
+    if (!$this->exists($shunt)) {
       return FALSE;
     }
 
-    return \Drupal::state()->get("shunt.{$shunt}", FALSE);
+    return $this->state->get("shunt.{$shunt}", FALSE);
   }
 
   /**
@@ -101,13 +135,13 @@ class ShuntHandler implements ShuntHandlerInterface {
    * @return bool
    *   Returns TRUE if the status was changed or FALSE if not.
    */
-  protected static function setStatus($shunt, $status) {
+  protected function setStatus($shunt, $status) {
     // Store arguments for t() reused below.
     $args = array('@name' => $shunt);
 
     // Make sure the shunt exists.
-    if (!static::exists($shunt)) {
-      drupal_set_message(t('No such shunt "@name".', $args), 'error');
+    if (!$this->exists($shunt)) {
+      drupal_set_message($this->t('No such shunt "@name".', $args), 'error');
       return FALSE;
     }
 
@@ -116,21 +150,21 @@ class ShuntHandler implements ShuntHandlerInterface {
 
     // Find out if the new status is actually different from the current one
     // and don't invoke hooks unless it is.
-    $current_status = static::isEnabled($shunt);
+    $current_status = $this->isEnabled($shunt);
     if ($bool_status === $current_status) {
       return FALSE;
     }
 
     // Set the status.
-    \Drupal::state()->set("shunt.{$shunt}", $bool_status);
+    $this->state->set("shunt.{$shunt}", $bool_status);
 
     // Report success.
-    $success_message['enabled'] = t('Shunt "@name" has been enabled.', $args);
-    $success_message['disabled'] = t('Shunt "@name" has been disabled.', $args);
+    $success_message['enabled'] = $this->t('Shunt "@name" has been enabled.', $args);
+    $success_message['disabled'] = $this->t('Shunt "@name" has been disabled.', $args);
     drupal_set_message($success_message[$bool_status ? 'enabled' : 'disabled']);
 
     $change = $bool_status ? 'enabled' : 'disabled';
-    \Drupal::moduleHandler()->invokeAll('shunt_post_change', array($shunt, $change));
+    $this->moduleHandler->invokeAll('shunt_post_change', array($shunt, $change));
 
     return TRUE;
   }
@@ -138,12 +172,12 @@ class ShuntHandler implements ShuntHandlerInterface {
   /**
    * {@inheritdoc}
    */
-  public static function setStatusMultiple($statuses) {
+  public function setStatusMultiple($statuses) {
     // Iterate over statuses.
     $changes = array();
     foreach ($statuses as $shunt => $status) {
       $bool_status = (bool) $status;
-      $changed = static::setStatus($shunt, (bool) $bool_status);
+      $changed = $this->setStatus($shunt, (bool) $bool_status);
       if ($changed) {
         $changes[$shunt] = $bool_status ? 'enabled' : 'disabled';
       }
@@ -151,8 +185,16 @@ class ShuntHandler implements ShuntHandlerInterface {
 
     // Only invoke hooks if changes actually took place.
     if (!empty($changes)) {
-      \Drupal::moduleHandler()->invokeAll('shunt_post_changeset', array($changes));
+      $this->moduleHandler->invokeAll('shunt_post_changeset', array($changes));
     }
   }
 
+  /**
+   * Translates a string to the current language or to a given language.
+   *
+   * See the t() documentation for details.
+   */
+  protected function t($string, array $args = array(), array $options = array()) {
+    return $this->translationManager->translate($string, $args, $options);
+  }
 }

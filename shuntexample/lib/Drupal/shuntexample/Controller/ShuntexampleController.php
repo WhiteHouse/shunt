@@ -23,7 +23,7 @@ class ShuntexampleController {
    */
   public function hello() {
     // Fail cheap if the "shuntexample" shunt is enabled.
-    if (\Drupal::moduleHandler()->moduleExists('shunt') && shunt_is_enabled('shuntexample')) {
+    if (\Drupal::moduleHandler()->moduleExists('shunt') && \Drupal::service('shunt.handler')->isEnabled('shuntexample')) {
       return array('#theme' => 'shuntexample_fail');
     }
 
