@@ -23,15 +23,6 @@ function shuntexample_menu() {
 }
 
 /**
- * Implements hook_shunt_info().
- */
-function shuntexample_shunt_info() {
-  return array(
-    'shuntexample' => t('An example shunt.'),
-  );
-}
-
-/**
  * Implements hook_theme().
  */
 function shuntexample_theme($existing, $type, $theme, $path) {

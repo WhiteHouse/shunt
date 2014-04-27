@@ -7,6 +7,7 @@
 
 namespace Drupal\shunt;
 
+use Drupal\Component\Discovery\YamlDiscovery;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\State\StateInterface;
 use Drupal\Core\StringTranslation\TranslationInterface;
@@ -94,18 +95,30 @@ class ShuntHandler implements ShuntHandlerInterface {
   public function getDefinitions() {
     $definitions = &drupal_static(__FUNCTION__);
     if (!isset($definitions)) {
-      // Get definitions.
-      $definitions = $this->moduleHandler->invokeAll('shunt_info');
-
-      foreach ($definitions as $name => $description) {
-        $shunt = new Shunt($name, $description);
-        $definitions[$shunt->getName()] = $shunt->getDescription();
+      // Loop through modules.
+      $discovery = $this->getDiscovery();
+      foreach ($discovery->findAll() as $shunts) {
+        // Loop through shunts in each module.
+        foreach ($shunts as $name => $description) {
+          $shunt = new Shunt($name, $description);
+          $definitions[$shunt->getName()] = $shunt->getDescription();
+        }
       }
 
       // Sort by machine name.
       ksort($definitions);
     }
     return $definitions;
+  }
+
+  /**
+   * Creates a YAML discovery for shunts.
+   *
+   * @return \Drupal\Component\Discovery\YamlDiscovery
+   *   A YAML discovery instance.
+   */
+  protected function getDiscovery() {
+    return new YamlDiscovery('shunts', $this->moduleHandler->getModuleDirectories());
   }
 
   /**

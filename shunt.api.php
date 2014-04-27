@@ -11,38 +11,6 @@
  */
 
 /**
- * Define shunts.
- *
- * For more granular control than the default, master shunt provides, you can
- * define any number of additional shunts and react to them individually. By
- * depending on these, you can choose on a case-by-case basis which pieces of
- * functionality to disable rather than having to disable all or none.
- *
- * Shunt machine names can be any valid PHP label except for "all". They should
- * be prefixed with the name of the module that defines them in order to avoid
- * namespace conflicts. Beyond that, names have no intrinsic meaning--the
- * effect a given shunt has is entirely dependent on the application code that
- * uses it.
- *
- * Shunt descriptions should be plain text (no HTML). Anything else will be
- * stripped out.
- *
- * @return array
- *   An array of shunts. Each shunt item is keyed by its machine name and has a
- *   value of a translated description string.
- */
-function hook_shunt_info() {
-  return array(
-    // It can be helpful to define a "master" shunt that toggles ALL
-    // functionality for your module as well as individual shunts for particular
-    // pieces of functionality.
-    'example' => t('The master shunt for the Example module. This toggles ALL module functionality.'),
-    'example_feature1' => t('This toggles feature 1 of the Example module.'),
-    'example_feature2' => t('This toggles feature 2 of the Example module.'),
-  );
-}
-
-/**
  * React to a shunt being changed.
  *
  * Perform one-time actions after a shunt gets enabled or disabled. This hook
