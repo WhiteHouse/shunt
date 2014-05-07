@@ -1,1 +1,2 @@
-shunt: The default shunt
+shunt:
+  description: The default shunt

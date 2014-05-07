@@ -1,4 +1,4 @@
 services:
-  shunt.handler:
-    class: Drupal\shunt\ShuntHandler
-    arguments: ['@module_handler', '@state', '@string_translation']
+  plugin.manager.shunt:
+    class: Drupal\shunt\ShuntManager
+    arguments: ['@module_handler', '@cache.discovery', '@language_manager', '@state', '@string_translation']

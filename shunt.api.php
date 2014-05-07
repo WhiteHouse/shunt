@@ -71,6 +71,21 @@ function hook_shunt_post_changeset($changes) {
 }
 
 /**
+ * Alter shunt definitions.
+ *
+ * @param array $shunts
+ *   An associative array of shunt definitions, where each item has a key of a
+ *   shunt machine and a value of the corresponding shunt definition array.
+ */
+function hook_shunts_alter(&$shunts) {
+  // You can change arbitrary shunt definition details.
+  $shunts['shunt']['description'] = t('A different description');
+
+  // Or remove undesired shunts altogether.
+  unset($shunts['shuntexample']);
+}
+
+/**
  * @} End of "addtogroup hooks".
  */
 
@@ -80,12 +95,12 @@ function hook_shunt_post_changeset($changes) {
 function shunt_demonstrate_shunt_use() {
   // Get the state of the shunts.
   $module_exists = \Drupal::moduleHandler()->moduleExists('shunt');
-  $shunt_handler = \Drupal::service('shunt.handler');
-  $master_shunt_is_enabled = ($module_exists && $shunt_handler->isEnabled()) ? TRUE : FALSE;
-  $specific_shunt_is_enabled = ($module_exists && $$shunt_handler->isEnabled('example')) ? TRUE : FALSE;
+  $shunt_manager = \Drupal::service('plugin.manager.shunt');
+  $default_shunt_is_enabled = ($module_exists && $shunt_manager->shuntIsEnabled('shunt')) ? TRUE : FALSE;
+  $specific_shunt_is_enabled = ($module_exists && $$shunt_manager->shuntIsEnabled('example')) ? TRUE : FALSE;
 
   // Depend on both shunts.
-  if ($master_shunt_is_enabled || $specific_shunt_is_enabled) {
+  if ($default_shunt_is_enabled || $specific_shunt_is_enabled) {
     // One of the shunts is enabled. Fail gracefully.
   }
   else {

@@ -5,8 +5,6 @@
  * Drush commands for the Shunt module.
  */
 
-use Drupal\shunt\ShuntHandler;
-
 /**
  * Implements hook_drush_command().
  */
@@ -98,12 +96,12 @@ function shunt_drush_command() {
  * @see shunt_drush_command()
  */
 function drush_shunt_disable() {
+  $shunt_manager = \Drupal::service('plugin.manager.shunt');
   $shunt_list = _shunt_drush_parse_shunt_list(func_get_args());
-  $shunt_handler = \Drupal::service('shunt.handler');
 
   // Discard shunts that are already disabled.
   foreach ($shunt_list as $key => $name) {
-    if (!$shunt_handler->isEnabled($name)) {
+    if (!$shunt_manager->shuntIsEnabled($name)) {
       drush_log(dt('Shunt "!name" is already disabled.', array(
         '!name' => $name,
       )), 'ok');
@@ -122,7 +120,7 @@ function drush_shunt_disable() {
     return drush_user_abort();
   }
 
-  $shunt_handler->disableMultiple($shunt_list);
+  $shunt_manager->disableShuntMultiple($shunt_list);
 }
 
 /**
@@ -140,12 +138,12 @@ function shunt_shunt_disable_complete() {
  * @see shunt_drush_command()
  */
 function drush_shunt_enable() {
+  $shunt_manager = \Drupal::service('plugin.manager.shunt');
   $shunt_list = _shunt_drush_parse_shunt_list(func_get_args());
-  $shunt_handler = \Drupal::service('shunt.handler');
 
   // Discard shunts that are already enabled.
   foreach ($shunt_list as $key => $name) {
-    if ($shunt_handler->isEnabled($name)) {
+    if ($shunt_manager->shuntIsEnabled($name)) {
       drush_log(dt('Shunt "!name" is already enabled.', array(
         '!name' => $name,
       )), 'ok');
@@ -164,7 +162,7 @@ function drush_shunt_enable() {
     return drush_user_abort();
   }
 
-  $shunt_handler->enableMultiple($shunt_list);
+  $shunt_manager->enableShuntMultiple($shunt_list);
 }
 
 /**
@@ -182,17 +180,16 @@ function shunt_shunt_enable_complete() {
  * @see shunt_drush_command()
  */
 function drush_shunt_info() {
-  $shunt_handler = \Drupal::service('shunt.handler');
-  $shunt_info = $shunt_handler->getDefinitions();
-
   $result = array();
 
+  $shunt_manager = \Drupal::service('plugin.manager.shunt');
+  $definitions = $shunt_manager->getDefinitions();
   $shunt_list = _shunt_drush_parse_shunt_list(func_get_args());
   foreach ($shunt_list as $shunt) {
     $result[$shunt] = array(
       'name' => $shunt,
-      'description' => $shunt_info[$shunt],
-      'status' => $shunt_handler->isEnabled($shunt) ? 'enabled' : 'disabled',
+      'description' => $definitions[$shunt]['description'],
+      'status' => $shunt_manager->shuntIsEnabled($shunt) ? 'Enabled' : 'Disabled',
     );
   }
 
@@ -236,19 +233,19 @@ function drush_shunt_list() {
 
   // Build result table.
   $result = array();
-  $shunt_handler = \Drupal::service('shunt.handler');
-  $shunt_info = $shunt_handler->getDefinitions();
-  foreach ($shunt_info as $name => $description) {
+  $shunt_manager = \Drupal::service('plugin.manager.shunt');
+  $definitions = $shunt_manager->getDefinitions();
+  foreach ($definitions as $id => $definition) {
     // Filter by status.
-    $status = ($shunt_handler->isEnabled($name)) ? 'enabled' : 'disabled';
+    $status = ($shunt_manager->shuntIsEnabled($id)) ? 'enabled' : 'disabled';
     if (!in_array($status, $status_filter)) {
       continue;
     }
 
     // Build row.
-    $result[$name] = array(
-      'name' => $name,
-      'description' => $description,
+    $result[$id] = array(
+      'name' => $id,
+      'description' => $definition['description'],
       'status' => ucfirst($status),
     );
   }
@@ -264,8 +261,8 @@ function drush_shunt_list() {
  */
 function _shunt_drush_complete_shunts() {
   if (drush_bootstrap_max(DRUSH_BOOTSTRAP_DRUPAL_FULL)) {
-    $shunt_info = \Drupal::service('shunt.handler')->getDefinitions();
-    $shunt_names = array_keys($shunt_info);
+    $definitions = \Drupal::service('plugin.manager.shunt')->getDefinitions();
+    $shunt_names = array_keys($definitions);
     return array('values' => $shunt_names);
   }
 }
@@ -281,11 +278,11 @@ function _shunt_drush_complete_shunts() {
  *   An indexed array of shunt names, by reference.
  */
 function _shunt_drush_expand_shunt_names(array &$shunts) {
-  $shunt_info = \Drupal::service('shunt.handler')->getDefinitions();
+  $definitions = \Drupal::service('plugin.manager.shunt')->getDefinitions();
   foreach ($shunts as $key => $shunt) {
     $wildcard = rtrim($shunt, '*');
     if ($wildcard !== $shunt) {
-      foreach (array_keys($shunt_info) as $shunt_name) {
+      foreach (array_keys($definitions) as $shunt_name) {
         if (substr($shunt_name, 0, strlen($wildcard)) == $wildcard) {
           $shunts[] = $shunt_name;
         }
@@ -307,14 +304,15 @@ function _shunt_drush_expand_shunt_names(array &$shunts) {
  *   An indexed array of shunt machine names.
  */
 function _shunt_drush_parse_shunt_list(array $raw_args) {
+  $shunt_manager = \Drupal::service('plugin.manager.shunt');
+
   // Convert comma separated values.
   $args_array = _convert_csv_to_array($raw_args);
 
-  $shunt_handler = \Drupal::service('shunt.handler');
-
   // The "all" keyword supersedes all other arguments. Return early.
   if (in_array('all', $args_array)) {
-    return array_keys($shunt_handler->getDefinitions());
+    $definitions = $shunt_manager->getDefinitions();
+    return array_keys($definitions);
   }
 
   // Expand wildcards.
@@ -326,7 +324,7 @@ function _shunt_drush_parse_shunt_list(array $raw_args) {
   // Discard non-existent shunts.
   $shunt_list = array();
   foreach ($unique_args as $name) {
-    if ($shunt_handler->exists($name)) {
+    if ($shunt_manager->shuntExists($name)) {
       $shunt_list[] = $name;
     }
     else {

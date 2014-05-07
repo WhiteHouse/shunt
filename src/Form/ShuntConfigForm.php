@@ -15,6 +15,19 @@ use Drupal\Core\Form\FormInterface;
 class ShuntConfigForm implements FormInterface {
 
   /**
+   * @var \Drupal\shunt\ShuntManager
+   *   The shunt manager.
+   */
+  protected $shuntManager;
+
+  /**
+   * Constructs a ShuntConfigForm object.
+   */
+  public function __construct() {
+    $this->shuntManager = \Drupal::service('plugin.manager.shunt');
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function getFormID() {
@@ -25,9 +38,6 @@ class ShuntConfigForm implements FormInterface {
    * {@inheritdoc}
    */
   public function buildForm(array $form, array &$form_state) {
-    $shunt_handler = \Drupal::service('shunt.handler');
-    $shunt_info = $shunt_handler->getDefinitions();
-
     // Define table header.
     $header = array(
       'name' => t('Name'),
@@ -37,12 +47,12 @@ class ShuntConfigForm implements FormInterface {
     // Build table rows.
     $options = array();
     $default_values = array();
-    foreach ($shunt_info as $name => $description) {
+    foreach ($this->shuntManager->getDefinitions() as $name => $definition) {
       $options[$name] = array(
         'name' => "<strong><label for=\"edit-shunts-{$name}\">{$name}</label></strong>",
-        'description' => $description,
+        'description' => $definition['description'],
       );
-      $default_values[$name] = $shunt_handler->isEnabled($name);
+      $default_values[$name] = $this->shuntManager->shuntIsEnabled($name);
     }
 
     // Compile table.
@@ -51,6 +61,7 @@ class ShuntConfigForm implements FormInterface {
       '#header' => $header,
       '#options' => $options,
       '#default_value' => $default_values,
+      '#empty' => t('No shunts available.'),
     );
 
     // Add submit button and handler.
@@ -72,7 +83,7 @@ class ShuntConfigForm implements FormInterface {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, array &$form_state) {
-    \Drupal::service('shunt.handler')->setStatusMultiple($form_state['values']['shunts']);
+    $this->shuntManager->setShuntStatusMultiple($form_state['values']['shunts']);
   }
 
 }

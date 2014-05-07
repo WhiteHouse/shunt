@@ -28,10 +28,10 @@ class ShuntUiTest extends WebTestBase {
   protected $privilegedUser;
 
   /**
-   * @var \Drupal\shunt\ShuntHandler
-   *   The shunt handler.
+   * @var \Drupal\shunt\ShuntManager
+   *   The shunt manager.
    */
-  protected $shuntHandler;
+  protected $shuntManager;
 
   /**
    * {@inheritdoc}
@@ -50,7 +50,7 @@ class ShuntUiTest extends WebTestBase {
   public function setUp() {
     parent::setUp();
 
-    $this->shuntHandler = \Drupal::service('shunt.handler');
+    $this->shuntManager = \Drupal::service('plugin.manager.shunt');
 
     $permissions = array('administer shunts');
     $this->privilegedUser = $this->drupalCreateUser($permissions);
@@ -70,7 +70,7 @@ class ShuntUiTest extends WebTestBase {
    *   t(). If left blank, a default message will be displayed.
    */
   protected function assertShuntStatus($name, $status, $message = '') {
-    $actual = $this->shuntHandler->isEnabled($name);
+    $actual = $this->shuntManager->shuntIsEnabled($name);
     $expected = (bool) $status;
     $this->assertIdentical($actual, $expected, $message);
   }
