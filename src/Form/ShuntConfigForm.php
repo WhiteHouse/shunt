@@ -41,6 +41,7 @@ class ShuntConfigForm implements FormInterface {
     // Define table header.
     $header = array(
       'name' => t('Name'),
+      'provider' => t('Provider'),
       'description' => t('Description'),
     );
 
@@ -50,6 +51,7 @@ class ShuntConfigForm implements FormInterface {
     foreach ($this->shuntManager->getDefinitions() as $name => $definition) {
       $options[$name] = array(
         'name' => "<strong><label for=\"edit-shunts-{$name}\">{$name}</label></strong>",
+        'provider' => $definition['provider'],
         'description' => $definition['description'],
       );
       $default_values[$name] = $this->shuntManager->shuntIsEnabled($name);

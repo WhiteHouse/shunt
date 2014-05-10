@@ -55,6 +55,7 @@ function shunt_drush_command() {
       'pipe-format' => 'json',
       'field-labels' => array(
         'name' => 'Name',
+        'provider' => 'Provider',
         'description' => 'Description',
         'status' => 'Status',
       ),
@@ -69,6 +70,10 @@ function shunt_drush_command() {
         'description' => 'Filter by shunt status. Choices: "enabled", "disabled".',
         'example-value' => 'enabled',
       ),
+      'provider' => array(
+        'description' => 'Filter by provider, i.e., the module that defines the shunt.',
+        'example-value' => 'shunt',
+      ),
     ),
     'examples' => array(
       'drush shunt-list' => 'Show all shunts.',
@@ -79,6 +84,7 @@ function shunt_drush_command() {
       'pipe-format' => 'list',
       'field-labels' => array(
         'name' => 'Name',
+        'provider' => 'Provider',
         'description' => 'Description',
         'status' => 'Status',
       ),
@@ -188,6 +194,7 @@ function drush_shunt_info() {
   foreach ($shunt_list as $shunt) {
     $result[$shunt] = array(
       'name' => $shunt,
+      'provider' => $definitions[$shunt]['provider'],
       'description' => $definitions[$shunt]['description'],
       'status' => $shunt_manager->shuntIsEnabled($shunt) ? 'Enabled' : 'Disabled',
     );
@@ -231,6 +238,18 @@ function drush_shunt_list() {
     }
   }
 
+  // Prepare and validate "provider" filter.
+  $provider_filter = strtolower(drush_get_option('provider'));
+  if (!empty($provider_filter)) {
+    $provider_filter = explode(',', $provider_filter);
+  }
+  else {
+    $provider_filter = array();
+  }
+  if (count($provider_filter) == 1) {
+    drush_hide_output_fields('provider');
+  }
+
   // Build result table.
   $result = array();
   $shunt_manager = \Drupal::service('plugin.manager.shunt');
@@ -242,9 +261,15 @@ function drush_shunt_list() {
       continue;
     }
 
+    // Filter by provider.
+    if (!empty($provider_filter) && !in_array($definition['provider'], $provider_filter)) {
+      continue;
+    }
+
     // Build row.
     $result[$id] = array(
       'name' => $id,
+      'provider' => $definition['provider'],
       'description' => $definition['description'],
       'status' => ucfirst($status),
     );
