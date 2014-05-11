@@ -13,7 +13,7 @@ namespace Drupal\shuntexample\Controller;
 class ShuntexampleController {
 
   /**
-   * Route callable method.
+   * Route content callback.
    *
    * @return array
    *   A theme array.
@@ -21,13 +21,34 @@ class ShuntexampleController {
    * @see shuntexample-hello.html.twig
    * @see shuntexample-fail.html.twig
    */
-  public function hello() {
+  public function helloContent() {
     // Fail cheap if the "shuntexample" shunt is enabled.
-    if (\Drupal::moduleHandler()->moduleExists('shunt') && \Drupal::service('plugin.manager.shunt')->shuntIsEnabled('shuntexample')) {
+    if ($this->isShuntTripped()) {
       return array('#theme' => 'shuntexample_fail');
     }
 
     // Expensive processing can be done down here.
     return array('#theme' => 'shuntexample_hello');
   }
+
+  /**
+   * Route title callback.
+   *
+   * @return string
+   *   A title string.
+   */
+  public function helloTitle() {
+    return ($this->isShuntTripped()) ? t('Fail whale!') : t('Hello world!');
+  }
+
+  /**
+   * Determines whether the shuntexample shunt is tripped.
+   *
+   * @return bool
+   *   TRUE if the the shunt is tripped or FALSE if not.
+   */
+  protected function isShuntTripped() {
+    return \Drupal::moduleHandler()->moduleExists('shunt') && \Drupal::service('plugin.manager.shunt')->shuntIsEnabled('shuntexample');
+  }
+
 }

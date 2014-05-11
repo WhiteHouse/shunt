@@ -1,6 +1,7 @@
 shuntexample.hello:
   path: '/shuntexample'
   defaults:
-    _content: '\Drupal\shuntexample\Controller\ShuntexampleController::hello'
+    _content: '\Drupal\shuntexample\Controller\ShuntexampleController::helloContent'
+    _title_callback: '\Drupal\shuntexample\Controller\ShuntexampleController::helloTitle'
   requirements:
     _permission: 'access content'
