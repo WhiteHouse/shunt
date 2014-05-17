@@ -14,12 +14,14 @@ use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\Plugin\Discovery\YamlDiscovery;
 use Drupal\Core\State\StateInterface;
-use Drupal\Core\StringTranslation\TranslationInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Shunt plugin manager.
  */
 class ShuntManager extends DefaultPluginManager {
+
+  use StringTranslationTrait;
 
   /**
    * Constructs a ShuntManager object.
@@ -32,17 +34,14 @@ class ShuntManager extends DefaultPluginManager {
    *   The language manager.
    * @param \Drupal\Core\State\StateInterface $state
    *   The state key/value store.
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $translation_manager
-   *   The translation manager.
    */
-  public function __construct(ModuleHandlerInterface $module_handler, CacheBackendInterface $cache, LanguageManagerInterface $language_manager, StateInterface $state, TranslationInterface $translation_manager) {
+  public function __construct(ModuleHandlerInterface $module_handler, CacheBackendInterface $cache, LanguageManagerInterface $language_manager, StateInterface $state) {
     $this->moduleHandler = $module_handler;
     $this->setCacheBackend($cache, $language_manager, 'shunt_plugins', array(
       'shunt' => TRUE,
     ));
     $this->discovery = $this->getDiscovery();
     $this->state = $state;
-    $this->translationManager = $translation_manager;
     $this->alterInfo('shunts');
   }
 
@@ -299,15 +298,6 @@ class ShuntManager extends DefaultPluginManager {
     $this->moduleHandler->invokeAll('shunt_post_change', array($name, $change));
 
     return TRUE;
-  }
-
-  /**
-   * Translates a string to the current language or to a given language.
-   *
-   * See the t() documentation for details.
-   */
-  protected function t($string, array $args = array(), array $options = array()) {
-    return $this->translationManager->translate($string, $args, $options);
   }
 
 }
