@@ -24,6 +24,20 @@ class ShuntManager extends DefaultPluginManager {
   use StringTranslationTrait;
 
   /**
+   * The cache backend.
+   *
+   * @var \Drupal\Core\Cache\CacheBackendInterface
+   */
+  protected $cache;
+
+  /**
+   * The state key/value store.
+   *
+   * @var \Drupal\Core\State\StateInterface
+   */
+  protected $state;
+
+  /**
    * Constructs a ShuntManager object.
    *
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
