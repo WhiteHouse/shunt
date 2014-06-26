@@ -18,10 +18,8 @@ WEBSERVER_USER=${1:-"www-data"}
 URI=${2:-"http://d8.dev/"}
 
 run_phpunit_tests() {
-  rm -rf tests/coverage
   cd ../../../core/
   ./vendor/bin/phpunit \
-    --coverage-html ../modules/contrib/shunt/tests/coverage \
     ../modules/contrib/shunt/tests/src/
 }
 
