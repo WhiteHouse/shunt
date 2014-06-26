@@ -10,7 +10,6 @@ namespace Drupal\shunt;
 use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
-use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\Plugin\Discovery\YamlDiscovery;
 use Drupal\Core\State\StateInterface;
@@ -44,16 +43,12 @@ class ShuntManager extends DefaultPluginManager {
    *   The module handler.
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache
    *   The cache backend.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
-   *   The language manager.
    * @param \Drupal\Core\State\StateInterface $state
    *   The state key/value store.
    */
-  public function __construct(ModuleHandlerInterface $module_handler, CacheBackendInterface $cache, LanguageManagerInterface $language_manager, StateInterface $state) {
+  public function __construct(ModuleHandlerInterface $module_handler, CacheBackendInterface $cache, StateInterface $state) {
     $this->moduleHandler = $module_handler;
-    $this->setCacheBackend($cache, $language_manager, 'shunt_plugins', array(
-      'shunt' => TRUE,
-    ));
+    $this->setCacheBackend($cache, 'shunt_plugins', array('shunt' => TRUE));
     $this->discovery = $this->getDiscovery();
     $this->state = $state;
     $this->alterInfo('shunts');
