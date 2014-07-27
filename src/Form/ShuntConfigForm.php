@@ -8,6 +8,7 @@
 namespace Drupal\shunt\Form;
 
 use Drupal\Core\Form\FormInterface;
+use Drupal\Component\Utility\String;
 
 /**
  * Provides a form for configuring available shunts.
@@ -50,9 +51,9 @@ class ShuntConfigForm implements FormInterface {
     $default_values = array();
     foreach ($this->shuntManager->getDefinitions() as $name => $definition) {
       $options[$name] = array(
-        'name' => "<strong><label for=\"edit-shunts-{$name}\">{$name}</label></strong>",
+        'name' => String::checkPlain($name),
         'provider' => $definition['provider'],
-        'description' => $definition['description'],
+        'description' => String::checkPlain($definition['description']),
       );
       $default_values[$name] = $this->shuntManager->shuntIsEnabled($name);
     }
