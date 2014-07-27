@@ -10,7 +10,9 @@ namespace Drupal\shunt\Tests;
 use Drupal\simpletest\WebTestBase;
 
 /**
- * Tests the Shunt UI.
+ * Tests the Shunt web UI.
+ *
+ * @group shunt
  */
 class ShuntUiTest extends WebTestBase {
 
@@ -32,17 +34,6 @@ class ShuntUiTest extends WebTestBase {
    *   The shunt manager.
    */
   protected $shuntManager;
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function getInfo() {
-    return array(
-      'name' => 'Shunt UI',
-      'description' => 'Tests the Shunt web UI.',
-      'group' => 'Shunt',
-    );
-  }
 
   /**
    * {@inheritdoc}

@@ -11,11 +11,8 @@ use Drupal\shunt\ShuntManager;
 use Drupal\Tests\UnitTestCase;
 
 /**
- * Tests the ShuntManager class.
- *
- * @group Shunt
- *
  * @coversDefaultClass \Drupal\shunt\ShuntManager
+ * @group shunt
  */
 class ShuntManagerTest extends UnitTestCase {
 
@@ -38,17 +35,6 @@ class ShuntManagerTest extends UnitTestCase {
    * An invalid shunt name.
    */
   const SHUNT_NAME_INVALID = FALSE;
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function getInfo() {
-    return array(
-      'name' => 'ShuntManager',
-      'description' => 'Tests the ShuntManager class.',
-      'group' => 'Shunt',
-    );
-  }
 
   /**
    * Tests shunt description validation.

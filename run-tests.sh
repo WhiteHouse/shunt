@@ -24,7 +24,7 @@ run_phpunit_tests() {
 }
 
 run_simpletest_tests() {
-  sudo -u ${WEBSERVER_USER} php scripts/run-tests.sh --url ${URI} Shunt
+  sudo -u ${WEBSERVER_USER} php scripts/run-tests.sh --url ${URI} shunt
 }
 
 run_phpunit_tests
