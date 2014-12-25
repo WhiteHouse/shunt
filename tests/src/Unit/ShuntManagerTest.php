@@ -5,7 +5,7 @@
  * Contains \Drupal\shunt\Tests\ShuntManagerTest.
  */
 
-namespace Drupal\shunt\Tests;
+namespace Drupal\Tests\shunt\Unit;
 
 use Drupal\shunt\ShuntManager;
 use Drupal\Tests\UnitTestCase;
