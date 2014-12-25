@@ -48,7 +48,7 @@ class ShuntManager extends DefaultPluginManager {
    */
   public function __construct(ModuleHandlerInterface $module_handler, CacheBackendInterface $cache, StateInterface $state) {
     $this->moduleHandler = $module_handler;
-    $this->setCacheBackend($cache, 'shunt_plugins', array('shunt' => TRUE));
+    $this->setCacheBackend($cache, 'shunt_info');
     $this->discovery = $this->getDiscovery();
     $this->state = $state;
     $this->alterInfo('shunts');
