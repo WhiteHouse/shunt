@@ -24,12 +24,6 @@ class ShuntUiTest extends WebTestBase {
   public static $modules = array('shunt', 'shuntexample');
 
   /**
-   * @var \Drupal\user\Entity\User
-   *   A user object with permission to administer shunts.
-   */
-  protected $privilegedUser;
-
-  /**
    * @var \Drupal\shunt\ShuntManager
    *   The shunt manager.
    */
@@ -43,9 +37,8 @@ class ShuntUiTest extends WebTestBase {
 
     $this->shuntManager = \Drupal::service('plugin.manager.shunt');
 
-    $permissions = array('administer shunts');
-    $this->privilegedUser = $this->drupalCreateUser($permissions);
-    $this->drupalLogin($this->privilegedUser);
+    $privileged_user = $this->drupalCreateUser(array('administer shunts'));
+    $this->drupalLogin($privileged_user);
   }
 
   /**

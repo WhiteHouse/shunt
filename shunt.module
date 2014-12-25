@@ -6,16 +6,3 @@
  *
  * Enable your site to fail gracefully under strain.
  */
-
-/**
- * Implements hook_permission().
- */
-function shunt_permission() {
-  return array(
-    'administer shunts' => array(
-      'title' => t('Administer shunts'),
-      'description' => t('Enable and disable shunts.'),
-      'restrict access' => TRUE,
-    ),
-  );
-}

@@ -1,0 +1,4 @@
+administer shunts:
+  title: 'Administer shunts'
+  description: 'Enable and disable shunts.'
+  restrict access: TRUE
