@@ -8,6 +8,7 @@
 namespace Drupal\shunt\Form;
 
 use Drupal\Core\Form\FormInterface;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Component\Utility\String;
 
 /**
@@ -38,7 +39,7 @@ class ShuntConfigForm implements FormInterface {
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, array &$form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state) {
     // Define table header.
     $header = array(
       'name' => t('Name'),
@@ -80,13 +81,14 @@ class ShuntConfigForm implements FormInterface {
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, array &$form_state) {}
+  public function validateForm(array &$form, FormStateInterface $form_state) {}
 
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, array &$form_state) {
-    $this->shuntManager->setShuntStatusMultiple($form_state['values']['shunts']);
+  public function submitForm(array &$form, FormStateInterface $form_state) {
+    $shunts = $form_state->getValue('shunts');
+    $this->shuntManager->setShuntStatusMultiple($shunts);
   }
 
 }
