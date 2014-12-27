@@ -91,7 +91,7 @@ class ShuntManager extends DefaultPluginManager {
    * @throws \Drupal\Component\Plugin\Exception\PluginException
    *   In case of an invalid definition.
    */
-  public static function validateDefinition($definition) {
+  public static function validateDefinition(array $definition) {
     $plugin_id = $definition['id'];
     if (!static::isValidShuntName($plugin_id)) {
       throw new PluginException(sprintf('Invalid shunt name "%s".', $plugin_id));
@@ -152,7 +152,7 @@ class ShuntManager extends DefaultPluginManager {
    * @return array
    *   The sanitized plugin definition.
    */
-  public static function sanitizeDefinition($definition) {
+  public static function sanitizeDefinition(array $definition) {
     $definition['description'] = strip_tags($definition['description']);
     return $definition;
   }
@@ -244,7 +244,7 @@ class ShuntManager extends DefaultPluginManager {
    *   its corresponding value is the new status value: TRUE for enabled or
    *   FALSE for disabled.
    */
-  public function setShuntStatusMultiple($statuses) {
+  public function setShuntStatusMultiple(array $statuses) {
     // Iterate over statuses.
     $changes = array();
     foreach ($statuses as $name => $status) {

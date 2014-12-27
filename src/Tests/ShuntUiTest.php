@@ -24,8 +24,9 @@ class ShuntUiTest extends WebTestBase {
   public static $modules = array('shunt', 'shuntexample');
 
   /**
+   * The shunt manager.
+   *
    * @var \Drupal\shunt\ShuntManager
-   *   The shunt manager.
    */
   protected $shuntManager;
 

@@ -17,8 +17,9 @@ use Drupal\Component\Utility\String;
 class ShuntConfigForm implements FormInterface {
 
   /**
+   * The shunt manager.
+   *
    * @var \Drupal\shunt\ShuntManager
-   *   The shunt manager.
    */
   protected $shuntManager;
 
@@ -32,7 +33,7 @@ class ShuntConfigForm implements FormInterface {
   /**
    * {@inheritdoc}
    */
-  public function getFormID() {
+  public function getFormId() {
     return 'shunt_config_form';
   }
 

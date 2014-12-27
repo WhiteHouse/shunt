@@ -24,14 +24,16 @@ class ShuntexampleTest extends WebTestBase {
   public static $modules = array('shunt', 'shuntexample');
 
   /**
+   * A user object with permission to administer shunts.
+   *
    * @var \Drupal\user\Entity\User
-   *   A user object with permission to administer shunts.
    */
   protected $privilegedUser;
 
   /**
+   * The shunt manager.
+   *
    * @var \Drupal\shunt\ShuntManager
-   *   The shunt manager.
    */
   protected $shuntManager;
 

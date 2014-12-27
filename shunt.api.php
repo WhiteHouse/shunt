@@ -55,7 +55,7 @@ function hook_shunt_post_change($shunt, $change) {
  *   each key is a shunt machine name and its corresponding value is the change
  *   that took place: either "enabled" or "disabled".
  */
-function hook_shunt_post_changeset($changes) {
+function hook_shunt_post_changeset(array $changes) {
   // This hook provides great flexibility to test for complex conditions so as
   // to avoid performing expensive operations more often than absolutely
   // necessary.
@@ -77,7 +77,7 @@ function hook_shunt_post_changeset($changes) {
  *   An associative array of shunt definitions, where each item has a key of a
  *   shunt machine and a value of the corresponding shunt definition array.
  */
-function hook_shunts_alter(&$shunts) {
+function hook_shunts_alter(array &$shunts) {
   // You can change arbitrary shunt definition details.
   $shunts['shunt']['description'] = t('A different description');
 

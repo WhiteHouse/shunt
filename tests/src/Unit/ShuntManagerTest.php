@@ -39,14 +39,14 @@ class ShuntManagerTest extends UnitTestCase {
   /**
    * Tests shunt description validation.
    *
-   * @dataProvider providerShuntDescriptionValidation
-   *
    * @param bool $expected
    *   The expected output from the method.
    * @param mixed $description
    *   The shunt description to test.
    * @param string $message
    *   The message to provide as output for the test.
+   *
+   * @dataProvider providerShuntDescriptionValidation
    */
   public function testShuntDescriptionValidation($expected, $description, $message) {
     $this->assertEquals($expected, ShuntManager::isValidShuntDescription($description), $message);
@@ -70,14 +70,14 @@ class ShuntManagerTest extends UnitTestCase {
   /**
    * Tests shunt name validation.
    *
-   * @dataProvider providerShuntNameValidation
-   *
    * @param bool $expected
    *   The expected output from the method.
    * @param string $name
    *   The shunt name to test.
    * @param string $message
    *   The message to provide as output for the test.
+   *
+   * @dataProvider providerShuntNameValidation
    */
   public function testShuntNameValidation($expected, $name, $message) {
     $this->assertEquals($expected, ShuntManager::isValidShuntName($name), $message);
@@ -148,14 +148,14 @@ class ShuntManagerTest extends UnitTestCase {
   /**
    * Tests shunt definition sanitization.
    *
-   * @dataProvider providerDefinitionSanitization
-   *
    * @param array $expected
    *   The expected output from the method.
    * @param array $definition
    *   The shunt definition to test.
    * @param string $message
    *   The message to provide as output for the test.
+   *
+   * @dataProvider providerDefinitionSanitization
    */
   public function testDefinitionSanitization(array $expected, array $definition, $message) {
     $this->assertArrayEquals($expected, ShuntManager::sanitizeDefinition($definition), $message);
