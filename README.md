@@ -1,19 +1,21 @@
+# Shunt
 
-CONTENTS OF THIS FILE
----------------------
+## Contents of This File
 
- * Introduction
- * Installation
- * Usage
- * Implementation
+- [Introduction](#introduction)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Implementation](#implementation)
 
 
-INTRODUCTION
-------------
+## Introduction
 
-  "In electronics, a shunt is a device which allows electric current to pass
-  around another point in the circuit by creating a low resistance path."
-  - source: http://en.wikipedia.org/wiki/Shunt_(electrical)
+Current maintainer: [whitehouse](https://www.drupal.org/u/whitehouse)
+
+> In electronics, a shunt is a device which allows electric current to pass
+> around another point in the circuit by creating a low resistance path.
+>
+> -- <cite>[Wikipedia](http://en.wikipedia.org/wiki/Shunt_(electrical))</cite>
 
 Shunt module provides a facility for developers to create virtual "shunts" that
 site administrators can enable (or "trip") in emergency situations, instructing
@@ -31,24 +33,23 @@ on them, and it gives site administrators the ability to enable and disable said
 shunts via the web UI or Drush.
 
 
-INSTALLATION
-------------
+## Installation
 
-Shunt module is installed in the usual way. See
-https://drupal.org/documentation/install/modules-themes/modules-8.
+Shunt module is installed in the usual way. See [Installing contributed
+modules](https://www.drupal.org/documentation/install/modules-themes/modules-8).
 
 
-USAGE
------
+## Usage
 
 Shunts can be enabled and disabled via the web UI at admin/config/system/shunt
 or via Drush. For a list of available Drush commands execute the following:
 
-  drush --filter=shunt
+```bash
+drush --filter=shunt
+```
 
 
-IMPLEMENTATION
---------------
+## Implementation
 
 For instructions on defining shunts or shunt-enabling a module, see
 shunt.api.php. For a working example see the included Shunt Example module.
