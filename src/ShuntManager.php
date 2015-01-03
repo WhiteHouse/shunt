@@ -8,6 +8,7 @@
 namespace Drupal\shunt;
 
 use Drupal\Component\Plugin\Exception\PluginException;
+use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
@@ -210,7 +211,13 @@ class ShuntManager extends DefaultPluginManager {
       return FALSE;
     }
 
-    return (bool) $this->getDefinition($name);
+    try {
+      $this->getDefinition($name);
+      return TRUE;
+    }
+    catch (PluginNotFoundException $e) {
+      return FALSE;
+    }
   }
 
   /**
