@@ -41,8 +41,9 @@ modules](https://www.drupal.org/documentation/install/modules-themes/modules-8).
 
 ## Usage
 
-Shunts can be enabled and disabled via the web UI at admin/config/system/shunt
-or via Drush. For a list of available Drush commands execute the following:
+Shunts can be enabled and disabled via the web UI at
+admin/config/development/shunts or via Drush. For a list of available Drush
+commands execute the following:
 
 ```bash
 drush --filter=shunt
