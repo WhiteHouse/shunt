@@ -14,13 +14,17 @@ function shunt_drush_command() {
   $items['shunt-enable'] = array(
     'description' => 'Enable one or more shunts.',
     'arguments' => array(
-      'shunts' => 'A list of shunt machine names, or "all" for all shunts. You can use a wildcard (*) at the end of shunt names to show info for multiple matches.',
+      'shunts' => 'A list of shunt machine names. You can use a wildcard (*) at the end of shunt names to show info for multiple matches.',
     ),
-    'required-arguments' => TRUE,
+    'options' => array(
+      'all' => array(
+        'description' => dt('Enable all shunts. Supersedes the "shunts" argument.'),
+      ),
+    ),
     'examples' => array(
-      'drush shunt-enable all' => 'Enable all shunts.',
       'drush shunt-enable example' => 'Enable the "example" shunt.',
       'drush shunt-enable example\*' => 'Enable all shunts whose names begin with "example".',
+      'drush shunt-enable --all' => 'Enable all shunts.',
     ),
     'aliases' => array('she'),
   );
@@ -28,13 +32,17 @@ function shunt_drush_command() {
   $items['shunt-disable'] = array(
     'description' => 'Disable one or more shunts.',
     'arguments' => array(
-      'shunts' => 'A list of shunt machine names, or "all" for all shunts. You can use a wildcard (*) at the end of shunt names to show info for multiple matches.',
+      'shunts' => 'A list of shunt machine names. You can use a wildcard (*) at the end of shunt names to show info for multiple matches.',
     ),
-    'required-arguments' => TRUE,
+    'options' => array(
+      'all' => array(
+        'description' => dt('Disable all shunts. Supersedes the "shunts" argument.'),
+      ),
+    ),
     'examples' => array(
-      'drush shunt-disable all' => 'Disable all shunts.',
       'drush shunt-disable example' => 'Disable the "example" shunt.',
       'drush shunt-disable example\*' => 'Disable all shunts whose names begin with "example".',
+      'drush shunt-disable --all' => 'Disable all shunts.',
     ),
     'aliases' => array('shd'),
   );
@@ -42,12 +50,12 @@ function shunt_drush_command() {
   $items['shunt-info'] = array(
     'description' => 'Show detailed info for one or more shunts.',
     'arguments' => array(
-      'shunts' => 'A list of shunt machine names, or "all" for all shunts. You can use a wildcard (*) at the end of shunt names to show info for multiple matches.',
+      'shunts' => 'A list of shunt machine names. You can use a wildcard (*) at the end of shunt names to show info for multiple matches. If no argument is provided it will show info for all available shunts.',
     ),
-    'required-arguments' => TRUE,
     'examples' => array(
       'drush shunt-info example' => 'Show info for the "example" shunt.',
       'drush shunt-info example\*' => 'Show info for all shunts whose names begin with "example".',
+      'drush shunt-info' => 'Show info for all shunts.',
     ),
     'aliases' => array('shi'),
     'outputformat' => array(
@@ -190,7 +198,17 @@ function drush_shunt_info() {
 
   $shunt_manager = \Drupal::service('plugin.manager.shunt');
   $definitions = $shunt_manager->getDefinitions();
-  $shunt_list = _shunt_drush_parse_shunt_list(func_get_args());
+
+  $args = func_get_args();
+  // If a list of shunts is supplied, parse it.
+  if (!empty($args)) {
+    $shunt_list = _shunt_drush_parse_shunt_list(func_get_args());
+  }
+  // Otherwise supply the list of all available shunts.
+  else {
+    $shunt_list = array_keys($definitions);
+  }
+
   foreach ($shunt_list as $shunt) {
     $result[$shunt] = array(
       'name' => $shunt,
@@ -334,8 +352,8 @@ function _shunt_drush_parse_shunt_list(array $raw_args) {
   // Convert comma separated values.
   $args_array = _convert_csv_to_array($raw_args);
 
-  // The "all" keyword supersedes all other arguments. Return early.
-  if (in_array('all', $args_array)) {
+  // The "all" option supersedes the "shunts" argument. Return early.
+  if (drush_get_option('all', FALSE)) {
     $definitions = $shunt_manager->getDefinitions();
     return array_keys($definitions);
   }

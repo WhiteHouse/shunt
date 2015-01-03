@@ -118,11 +118,6 @@ class ShuntManager extends DefaultPluginManager {
       return FALSE;
     }
 
-    $reserved_words = array('all');
-    if (in_array($name, $reserved_words)) {
-      return FALSE;
-    }
-
     // @see http://php.net/manual/en/language.variables.basics.php
     $pattern = '/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/';
     return (bool) preg_match($pattern, $name);

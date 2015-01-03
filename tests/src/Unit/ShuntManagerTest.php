@@ -94,12 +94,12 @@ class ShuntManagerTest extends UnitTestCase {
     $tests[] = array(TRUE, '_shunt', 'Did not accept a shunt name with a leading underscore.');
     $tests[] = array(TRUE, 'shunt1', 'Did not accept a shunt name with a digit.');
     $tests[] = array(TRUE, 'shünt', 'Did not accept a shunt name with a valid Unicode character.');
+    $tests[] = array(TRUE, 'all', 'Did not accept the formerly reserved shunt name "all".');
     $tests[] = array(TRUE, '_', 'Did not accept a single underscore as a shunt name.');
 
     // Invalid names.
     $tests[] = array(FALSE, '1shunt', 'Did not reject a shunt name beginning with a digit.');
     $tests[] = array(FALSE, '$hunt', 'Did not reject a shunt name with an illegal character.');
-    $tests[] = array(FALSE, 'all', 'Did not reject the reserved shunt name "all".');
     $tests[] = array(FALSE, '', 'Did not reject a zero length shunt name.');
     $tests[] = array(FALSE, [], 'Did not reject an array shunt name.');
 
