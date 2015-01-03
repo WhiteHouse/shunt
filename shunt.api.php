@@ -96,8 +96,8 @@ function shunt_demonstrate_shunt_use() {
   // Get the state of the shunts.
   $module_exists = \Drupal::moduleHandler()->moduleExists('shunt');
   $shunt_manager = \Drupal::service('plugin.manager.shunt');
-  $default_shunt_is_enabled = ($module_exists && $shunt_manager->shuntIsEnabled('shunt')) ? TRUE : FALSE;
-  $specific_shunt_is_enabled = ($module_exists && $$shunt_manager->shuntIsEnabled('example')) ? TRUE : FALSE;
+  $default_shunt_is_enabled = $module_exists && $shunt_manager->shuntIsEnabled('shunt');
+  $specific_shunt_is_enabled = $module_exists && $shunt_manager->shuntIsEnabled('example');
 
   // Depend on both shunts.
   if ($default_shunt_is_enabled || $specific_shunt_is_enabled) {
