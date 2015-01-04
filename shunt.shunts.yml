@@ -1,2 +1,2 @@
 shunt:
-  description: The default shunt
+  description: Default shunt. No built-in behavior.

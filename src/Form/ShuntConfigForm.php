@@ -7,9 +7,9 @@
 
 namespace Drupal\shunt\Form;
 
+use Drupal\Component\Utility\String;
 use Drupal\Core\Form\FormInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Component\Utility\String;
 
 /**
  * Provides a form for configuring available shunts.
