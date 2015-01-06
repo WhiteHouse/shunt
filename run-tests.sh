@@ -32,6 +32,18 @@ echo "Running PHPUnit tests..."
 ${DRUPAL_ROOT}/core/vendor/bin/phpunit --configuration="$DRUPAL_ROOT/core" "$SCRIPT_DIR/tests/src"
 echo
 
+# Run Unish tests.
+echo "Running Unish tests..."
+UNAME=`uname`
+if [ ${UNAME} = "Linux" ]; then
+  DRUSH_PATH="`readlink -f $(which drush)`"
+elif [ ${UNAME} = "Darwin" ] || [ ${UNAME} = "FreeBSD" ]; then
+  DRUSH_PATH="`realpath $(which drush)`"
+fi
+DRUSH_DIR="`dirname -- "$DRUSH_PATH"`"
+${DRUPAL_ROOT}/core/vendor/bin/phpunit --configuration="$DRUSH_DIR/tests" "$SCRIPT_DIR/drush"
+echo
+
 # Run Simpletest tests.
 echo "Running Simpletest tests..."
 WEBSERVER_USER=${1:-"www-data"}
