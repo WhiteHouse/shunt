@@ -51,26 +51,15 @@ if (class_exists('Unish\CommandUnishTestCase')) {
     }
 
     /**
-     * Recursively converts an array to an object.
+     * Returns the JSON representation of a given value, pretty printed.
      *
-     * @param array $array
-     *   An arbitrary array.
-     *
-     * @return \stdClass
-     *   Returns a class corresponding to the given array.
+     * @param mixed $value
+     *   The value to encode.
+     * @return string
+     *   Returns a JSON encoded string on success or FALSE on failure.
      */
-    public static function arrayToObject(array $array) {
-      $object = new \stdClass;
-      foreach ($array as $key => $value) {
-        if (strlen($key)) {
-          if (is_array($value)) {
-            $object->{$key} = static::arrayToObject($value);
-          } else {
-            $object->{$key} = $value;
-          }
-        }
-      }
-      return $object;
+    public static function jsonEncode($value) {
+      return json_encode($value, JSON_PRETTY_PRINT);
     }
 
     /**
@@ -93,22 +82,22 @@ if (class_exists('Unish\CommandUnishTestCase')) {
           'status' => 'Disabled',
         )
       );
-      $output_unfiltered = static::arrayToObject($shunt_list);
-      $output_enabled = static::arrayToObject(array('shunt' => $shunt_list['shunt']));
-      $output_disabled = static::arrayToObject(array('shuntexample' => $shunt_list['shuntexample']));
+      $output_unfiltered = static::jsonEncode($shunt_list);
+      $output_enabled = static::jsonEncode(array('shunt' => $shunt_list['shunt']));
+      $output_disabled = static::jsonEncode(array('shuntexample' => $shunt_list['shuntexample']));
 
       $options = $this->drushOptions + array('format' => 'json');
 
       // Test unfiltered output.
       $this->drush('shunt-list', array(), $options);
-      $this->assertEquals($output_unfiltered, $this->getOutputFromJSON());
+      $this->assertEquals($output_unfiltered, $this->getOutput());
 
       // Test "status" option.
       $this->drush('shunt-list', array(), $options + array('status' => 'enabled'));
-      $this->assertEquals($output_enabled, $this->getOutputFromJSON());
+      $this->assertEquals($output_enabled, $this->getOutput());
 
       $this->drush('shunt-list', array(), $options + array('status' => 'disabled'));
-      $this->assertEquals($output_disabled, $this->getOutputFromJSON());
+      $this->assertEquals($output_disabled, $this->getOutput());
 
       $this->drush('shunt-list', array(), $options + array('status' => 'invalid'), NULL, NULL, self::EXIT_ERROR);
       $this->assertStringStartsWith('"invalid" is not a valid shunt status.', $this->getErrorOutput());
