@@ -32,6 +32,13 @@ if (class_exists('Unish\CommandUnishTestCase')) {
     protected $drushOptions = array('root' => '', 'uri' => '');
 
     /**
+     * All available shunt machine names.
+     *
+     * @var array
+     */
+    protected $allShunts = array('shunt', 'shuntexample');
+
+    /**
      * {@inheritdoc}
      */
     public function setUp() {
@@ -44,10 +51,10 @@ if (class_exists('Unish\CommandUnishTestCase')) {
       symlink($shunt_directory, $this->webroot() . '/modules/shunt');
 
       // Enable the Shunt modules.
-      $this->drush('pm-enable', array(
-        'shunt',
-        'shuntexample',
-      ), $this->drushOptions + array('skip' => NULL, 'yes' => NULL));
+      $this->drush('pm-enable', $this->allShunts, $this->drushOptions + array(
+        'skip' => NULL,
+        'yes' => NULL,
+      ));
     }
 
     /**
@@ -121,7 +128,7 @@ if (class_exists('Unish\CommandUnishTestCase')) {
      * Tests the shunt-list command.
      */
     public function testShuntListCommand() {
-      $this->drush('shunt-enable' , array('shunt'), $this->drushOptions + array('yes' => NULL));
+      $this->enableShunts(array('shunt'));
 
       $shunt_list = array(
         'shunt' => array(
@@ -157,11 +164,11 @@ if (class_exists('Unish\CommandUnishTestCase')) {
       $this->drush('shunt-list', array(), $options + array('status' => 'invalid'), NULL, NULL, self::EXIT_ERROR);
       $this->assertStringStartsWith('"invalid" is not a valid shunt status.', $this->getErrorOutput());
 
-      $this->drush('shunt-enable' , array('shuntexample'), $this->drushOptions + array('yes' => NULL));
+      $this->enableShunts(array('shuntexample'));
       $this->drush('shunt-list', array(), $options + array('status' => 'disabled'));
       $this->assertEquals('', $this->getOutput());
 
-      $this->drush('shunt-disable' , array(), $this->drushOptions + array('all' => NULL, 'yes' => NULL));
+      $this->resetShunts();
       $this->drush('shunt-list', array(), $options + array('status' => 'enabled'));
       $this->assertEquals('', $this->getOutput());
     }
@@ -170,9 +177,44 @@ if (class_exists('Unish\CommandUnishTestCase')) {
      * Resets all shunts to their default (disabled) state.
      */
     protected function resetShunts() {
-      // @todo Figure out how to do this directly, without using Shunt Drush
-      //   commands. See comment in ShuntUnishTest::shuntIsEnabled().
-      $this->drush('shunt-disable' , array(), $this->drushOptions + array('all' => NULL, 'yes' => NULL));
+      $this->disableShunts($this->allShunts);
+    }
+
+    /**
+     * Enables a given list of shunts.
+     *
+     * @param array $names
+     *   An indexed array of shunt names.
+     */
+    protected function enableShunts(array $names) {
+      $statuses = array_fill_keys($names, TRUE);
+      $this->setShuntStatuses($statuses);
+    }
+
+    /**
+     * Disables a given list of shunts.
+     *
+     * @param array $names
+     *   An indexed array of shunt names.
+     */
+    protected function disableShunts(array $names) {
+      $statuses = array_fill_keys($names, FALSE);
+      $this->setShuntStatuses($statuses);
+    }
+
+    /**
+     * Sets the status of a given list of shunts.
+     *
+     * @param array $statuses
+     *   An associative array of shunt statuses where each key is a shunt
+     *   machine name and its value is the status to set the shunt to.
+     */
+    protected function setShuntStatuses(array $statuses) {
+      foreach ($statuses as $name => $status) {
+        // Set state values directly to avoid using Shunt commands to test Shunt
+        // commands.
+        $this->drush('state-set', array("shunt.{$name}", $status ? 1 : 0), $this->drushOptions);
+      }
     }
 
     /**
@@ -185,17 +227,10 @@ if (class_exists('Unish\CommandUnishTestCase')) {
      *   Returns TRUE if the shunt is enabled or FALSE if it is disabled.
      */
     protected function shuntIsEnabled($name) {
-      // @todo Figure out how to do this directly with ShuntManager to avoid
-      //   using the Drush commands to test the Drush commands. At present,
-      //   executing, for example,
-      //   \Drupal::service('plugin.manager.shunt')->shuntIsEnabled($name)
-      //   from this context results in a fatal error.
-      $options = $this->drushOptions + array(
-        'fields' => 'status',
-        'format' => 'list',
-      );
-      $this->drush('shunt-info', array($name), $options);
-      return $this->getOutput() === 'Enabled';
+      // Access state values directly to avoid using Shunt commands to test
+      // Shunt commands.
+      $this->drush('state-get', array("shunt.{$name}"), $this->drushOptions);
+      return $this->getOutput() === 'true';
     }
 
   }
