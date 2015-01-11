@@ -76,7 +76,7 @@ if (class_exists('Unish\CommandUnishTestCase')) {
     public function testShuntEnableCommand() {
       $this->drush('shunt-enable', array(), array(), $this->site);
       $this->assertStringStartsWith('There were no shunts that could be enabled.', $this->getErrorOutput());
-      $this->assertFalse($this->shuntIsEnabled('shunt'), 'No shunts enabled without "shunts" argument.');
+      $this->assertShuntIsDisabled('shunt', 'No shunts enabled without "shunts" argument.');
 
       $this->drush('shunt-enable', array('invalid'), array(), $this->site);
       $this->assertStringStartsWith('No such shunt "invalid".', $this->getErrorOutput(), 'Warned about invalid "shunts" argument.');
@@ -86,14 +86,14 @@ if (class_exists('Unish\CommandUnishTestCase')) {
       $this->assertEquals('The following shunts will be enabled: shunt', $output[0]);
       $this->assertEquals('Do you want to continue? (y/n): n', $output[1]);
       $this->assertStringStartsWith('Aborting.', $this->getErrorOutput());
-      $this->assertFalse($this->shuntIsEnabled('shunt'), 'Shunt was not enabled with "no" option.');
+      $this->assertShuntIsDisabled('shunt', 'Shunt was not enabled with "no" option.');
 
       $this->drush('shunt-enable', array('shunt'), array('yes' => NULL), $this->site);
       $this->assertStringStartsWith('Shunt "shunt" has been enabled.', $this->getErrorOutput());
       $output = $this->getOutputAsList();
       $this->assertEquals('The following shunts will be enabled: shunt', $output[0]);
       $this->assertEquals('Do you want to continue? (y/n): y', $output[1]);
-      $this->assertTrue($this->shuntIsEnabled('shunt'), 'Shunt was enabled with "yes" option.');
+      $this->assertShuntIsEnabled('shunt', 'Shunt was enabled with "yes" option.');
 
       $this->drush('shunt-enable', array('shunt'), array('no' => NULL), $this->site);
       $error_output = $this->getErrorOutputAsList();
@@ -175,6 +175,46 @@ if (class_exists('Unish\CommandUnishTestCase')) {
     }
 
     /**
+     * Asserts that a given shunt is enabled.
+     *
+     * @param string $name
+     *   The machine name of the shunt.
+     * @param string $message
+     *   The assertion message.
+     */
+    public function assertShuntIsEnabled($name, $message = '') {
+      $this->assertTrue($this->shuntIsEnabled($name), $message);
+    }
+
+    /**
+     * Asserts that a given shunt is disabled.
+     *
+     * @param string $name
+     *   The machine name of the shunt.
+     * @param string $message
+     *   The assertion message.
+     */
+    public function assertShuntIsDisabled($name, $message = '') {
+      $this->assertFalse($this->shuntIsEnabled($name), $message);
+    }
+
+    /**
+     * Determines whether a given shunt is enabled or not.
+     *
+     * @param string $name
+     *   The machine name of the shunt.
+     *
+     * @return bool
+     *   Returns TRUE if the shunt is enabled or FALSE if it is disabled.
+     */
+    protected function shuntIsEnabled($name) {
+      // Access state values directly to avoid using Shunt commands to test
+      // Shunt commands.
+      $this->drush('state-get', array("shunt.{$name}"), array(), $this->site);
+      return (bool) $this->getOutput();
+    }
+
+    /**
      * Resets all shunts to their default (disabled) state.
      */
     protected function resetShunts() {
@@ -214,24 +254,8 @@ if (class_exists('Unish\CommandUnishTestCase')) {
       foreach ($statuses as $name => $status) {
         // Set state values directly to avoid using Shunt commands to test Shunt
         // commands.
-        $this->drush('state-set', array("shunt.{$name}", $status ? 1 : 0), array(), $this->site);
+        $this->drush('state-set', array("shunt.{$name}", $status ? 'true' : 0), array(), $this->site);
       }
-    }
-
-    /**
-     * Determines whether a given shunt is enabled or not.
-     *
-     * @param string $name
-     *   The machine name of the shunt.
-     *
-     * @return bool
-     *   Returns TRUE if the shunt is enabled or FALSE if it is disabled.
-     */
-    protected function shuntIsEnabled($name) {
-      // Access state values directly to avoid using Shunt commands to test
-      // Shunt commands.
-      $this->drush('state-get', array("shunt.{$name}"), array(), $this->site);
-      return $this->getOutput() === 'true';
     }
 
   }
