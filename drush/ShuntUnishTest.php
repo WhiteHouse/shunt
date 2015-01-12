@@ -71,6 +71,63 @@ if (class_exists('Unish\CommandUnishTestCase')) {
     }
 
     /**
+     * Tests the shunt-disable command.
+     */
+    public function testShuntDisableCommand() {
+      $this->enableShunts($this->allShunts);
+
+      $this->drush('shunt-disable', array(), array(), $this->site);
+      $this->assertStringStartsWith('There were no shunts that could be disabled.', $this->getErrorOutput());
+      $this->assertShuntIsEnabled('shunt', 'No shunts disabled without "shunts" argument.');
+
+      $this->drush('shunt-disable', array('invalid'), array(), $this->site);
+      $this->assertStringStartsWith('No such shunt "invalid".', $this->getErrorOutput(), 'Warned about invalid "shunts" argument.');
+
+      $this->drush('shunt-disable', array('shunt'), array('no' => NULL), $this->site);
+      $output = $this->getOutputAsList();
+      $this->assertEquals('The following shunts will be disabled: shunt', $output[0]);
+      $this->assertEquals('Do you want to continue? (y/n): n', $output[1]);
+      $this->assertStringStartsWith('Aborting.', $this->getErrorOutput());
+      $this->assertShuntIsEnabled('shunt', 'Shunt was not disabled with "no" option.');
+
+      $this->drush('shunt-disable', array('shunt'), array('yes' => NULL), $this->site);
+      $this->assertStringStartsWith('Shunt "shunt" has been disabled.', $this->getErrorOutput());
+      $output = $this->getOutputAsList();
+      $this->assertEquals('The following shunts will be disabled: shunt', $output[0]);
+      $this->assertEquals('Do you want to continue? (y/n): y', $output[1]);
+      $this->assertShuntIsDisabled('shunt', 'Shunt was disabled with "yes" option.');
+
+      $this->drush('shunt-disable', array('shunt'), array('no' => NULL), $this->site);
+      $error_output = $this->getErrorOutputAsList();
+      $this->assertStringStartsWith('Shunt "shunt" is already disabled.', $error_output[0]);
+      $this->assertStringStartsWith('There were no shunts that could be disabled.', $error_output[1], 'Did not try to enable already disabled shunt.');
+
+      $this->enableShunts($this->allShunts);
+
+      $this->drush('shunt-disable', $this->allShunts, array('yes' => NULL), $this->site);
+      $this->assertStringStartsWith('The following shunts will be disabled: shunt, shuntexample', $this->getOutput());
+      $this->assertTrue(!$this->shuntIsEnabled('shunt') && !$this->shuntIsEnabled('shuntexample'), 'Disabled multiple, explicitly named shunts.');
+
+      $this->enableShunts($this->allShunts);
+
+      $this->drush('shunt-disable', array(), array('all' => NULL, 'yes' => NULL), $this->site);
+      $this->assertStringStartsWith('The following shunts will be disabled: shunt, shuntexample', $this->getOutput());
+      $error_output = $this->getErrorOutputAsList();
+      $this->assertStringStartsWith('Shunt "shunt" has been disabled.', $error_output[0]);
+      $this->assertStringStartsWith('Shunt "shuntexample" has been disabled.', $error_output[1]);
+      $this->assertTrue(!$this->shuntIsEnabled('shunt') && !$this->shuntIsEnabled('shuntexample'), 'Disabled all shunts with "all" option.');
+
+      $this->enableShunts($this->allShunts);
+
+      $this->drush('shunt-disable', array('*'), array('no' => NULL), $this->site);
+      $this->assertStringStartsWith('The following shunts will be disabled: shunt, shuntexample', $this->getOutput(), 'Correctly expanded bare asterisk "shunts" argument.');
+      $this->drush('shunt-disable', array('shunt*'), array('no' => NULL), $this->site);
+      $this->assertStringStartsWith('The following shunts will be disabled: shunt, shuntexample', $this->getOutput(), 'Correctly expanded "shunts" argument with trailing slash and multiple matches.');
+      $this->drush('shunt-disable', array('shuntex*'), array('no' => NULL), $this->site);
+      $this->assertStringStartsWith('The following shunts will be disabled: shuntexample', $this->getOutput(), 'Correctly expanded "shunts" argument with trailing slash and single match.');
+    }
+
+    /**
      * Tests the shunt-enable command.
      */
     public function testShuntEnableCommand() {
