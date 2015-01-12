@@ -15,16 +15,6 @@ if (class_exists('Unish\CommandUnishTestCase')) {
   class ShuntUnishTest extends CommandUnishTestCase {
 
     /**
-     * The description of the "shunt" shunt.
-     */
-    const SHUNT_SHUNT_DESCRIPTION = 'Default shunt. No built-in behavior.';
-
-    /**
-     * The description of the "shuntexample" shunt.
-     */
-    const SHUNTEXAMPLE_SHUNT_DESCRIPTION = 'Display a fail whale at /shuntexample.';
-
-    /**
      * The sandbox site specification.
      *
      * @var string
@@ -55,19 +45,6 @@ if (class_exists('Unish\CommandUnishTestCase')) {
         'skip' => NULL,
         'yes' => NULL,
       ), $this->site);
-    }
-
-    /**
-     * Returns the JSON representation of a given value, pretty printed.
-     *
-     * @param mixed $value
-     *   The value to encode.
-     *
-     * @return string
-     *   Returns a JSON encoded string on success or FALSE on failure.
-     */
-    public static function jsonEncode($value) {
-      return json_encode($value, JSON_PRETTY_PRINT);
     }
 
     /**
@@ -157,13 +134,13 @@ if (class_exists('Unish\CommandUnishTestCase')) {
       $this->assertStringStartsWith('Shunt "shunt" is already enabled.', $error_output[0]);
       $this->assertStringStartsWith('There were no shunts that could be enabled.', $error_output[1], 'Did not try to enable already enabled shunt.');
 
-      $this->resetShunts();
+      $this->disableShunts($this->allShunts);
 
       $this->drush('shunt-enable', $this->allShunts, array('yes' => NULL), $this->site);
       $this->assertStringStartsWith('The following shunts will be enabled: shunt, shuntexample', $this->getOutput());
       $this->assertTrue($this->shuntIsEnabled('shunt') && $this->shuntIsEnabled('shuntexample'), 'Enabled multiple, explicitly named shunts.');
 
-      $this->resetShunts();
+      $this->disableShunts($this->allShunts);
 
       $this->drush('shunt-enable', array(), array('all' => NULL, 'yes' => NULL), $this->site);
       $this->assertStringStartsWith('The following shunts will be enabled: shunt, shuntexample', $this->getOutput());
@@ -172,7 +149,7 @@ if (class_exists('Unish\CommandUnishTestCase')) {
       $this->assertStringStartsWith('Shunt "shuntexample" has been enabled.', $error_output[1]);
       $this->assertTrue($this->shuntIsEnabled('shunt') && $this->shuntIsEnabled('shuntexample'), 'Enabled all shunts with "all" option.');
 
-      $this->resetShunts();
+      $this->disableShunts($this->allShunts);
 
       $this->drush('shunt-enable', array('*'), array('no' => NULL), $this->site);
       $this->assertStringStartsWith('The following shunts will be enabled: shunt, shuntexample', $this->getOutput(), 'Correctly expanded bare asterisk "shunts" argument.');
@@ -183,52 +160,62 @@ if (class_exists('Unish\CommandUnishTestCase')) {
     }
 
     /**
+     * Tests the shunt-info command.
+     */
+    public function testShuntInfoCommand() {
+      $this->enableShunts(array('shunt'));
+
+      $options = array('format' => 'json');
+
+      $this->drush('shunt-info', array(), $options, $this->site);
+      $this->assertEquals($this->shuntInfo(), $this->getOutput(), 'Returned all info without "shunts" argument.');
+
+      $this->drush('shunt-info', array('invalid'), array(), $this->site);
+      $this->assertStringStartsWith('No such shunt "invalid".', $this->getErrorOutput(), 'Warned about invalid "shunts" argument.');
+
+      $this->drush('shunt-info', array('shunt'), $options, $this->site);
+      $this->assertEquals($this->shuntInfo('shunt'), $this->getOutput(), 'Returned info for explicitly named shunt.');
+
+      $this->drush('shunt-info', $this->allShunts, $options, $this->site);
+      $this->assertEquals($this->shuntInfo(), $this->getOutput(), 'Returned info for multiple, explicitly named shunts.');
+
+      $this->drush('shunt-info', array('*'), $options, $this->site);
+      $this->assertEquals($this->shuntInfo(), $this->getOutput(), 'Correctly expanded bare asterisk "shunts" argument.');
+
+      $this->drush('shunt-info', array('shunt*'), $options, $this->site);
+      $this->assertEquals($this->shuntInfo(), $this->getOutput(), 'Correctly expanded "shunts" argument with trailing slash and multiple matches.');
+
+      $this->drush('shunt-info', array('shuntex*'), $options, $this->site);
+      $this->assertEquals($this->shuntInfo('shuntexample'), $this->getOutput(), 'Correctly expanded "shunts" argument with trailing slash and single match.');
+    }
+
+    /**
      * Tests the shunt-list command.
      */
     public function testShuntListCommand() {
       $this->enableShunts(array('shunt'));
 
-      $shunt_list = array(
-        'shunt' => array(
-          'name' => 'shunt',
-          'provider' => 'shunt',
-          'description' => self::SHUNT_SHUNT_DESCRIPTION,
-          'status' => 'Enabled',
-        ),
-        'shuntexample' => array(
-          'name' => 'shuntexample',
-          'provider' => 'shuntexample',
-          'description' => self::SHUNTEXAMPLE_SHUNT_DESCRIPTION,
-          'status' => 'Disabled',
-        ),
-      );
-      $output_unfiltered = static::jsonEncode($shunt_list);
-      $output_enabled = static::jsonEncode(array('shunt' => $shunt_list['shunt']));
-      $output_disabled = static::jsonEncode(array('shuntexample' => $shunt_list['shuntexample']));
-
       $options = array('format' => 'json');
 
-      // Test unfiltered output.
       $this->drush('shunt-list', array(), $options, $this->site);
-      $this->assertEquals($output_unfiltered, $this->getOutput());
+      $this->assertEquals($this->shuntInfo(), $this->getOutput(), 'Returned all info without "status" option.');
 
-      // Test "status" option.
       $this->drush('shunt-list', array(), $options + array('status' => 'enabled'), $this->site);
-      $this->assertEquals($output_enabled, $this->getOutput());
+      $this->assertEquals($this->shuntInfo('shunt'), $this->getOutput(), 'Filtered info to enabled shunts.');
 
       $this->drush('shunt-list', array(), $options + array('status' => 'disabled'), $this->site);
-      $this->assertEquals($output_disabled, $this->getOutput());
+      $this->assertEquals($this->shuntInfo('shuntexample'), $this->getOutput(), 'Filtered info to disabled shunts.');
 
       $this->drush('shunt-list', array(), $options + array('status' => 'invalid'), $this->site, NULL, self::EXIT_ERROR);
-      $this->assertStringStartsWith('"invalid" is not a valid shunt status.', $this->getErrorOutput());
+      $this->assertStringStartsWith('"invalid" is not a valid shunt status.', $this->getErrorOutput(), 'Erred on invalid "status" option.');
 
       $this->enableShunts(array('shuntexample'));
       $this->drush('shunt-list', array(), $options + array('status' => 'disabled'), $this->site);
-      $this->assertEquals('', $this->getOutput());
+      $this->assertEquals('', $this->getOutput(), 'Returned empty when filtered to enabled shunts without any available.');
 
-      $this->resetShunts();
+      $this->disableShunts($this->allShunts);
       $this->drush('shunt-list', array(), $options + array('status' => 'enabled'), $this->site);
-      $this->assertEquals('', $this->getOutput());
+      $this->assertEquals('', $this->getOutput(), 'Returned empty when filtered to disabled shunts without any available.');
     }
 
     /**
@@ -272,10 +259,46 @@ if (class_exists('Unish\CommandUnishTestCase')) {
     }
 
     /**
-     * Resets all shunts to their default (disabled) state.
+     * Returns a given subset of available shunt info, JSON-encoded.
+     *
+     * @param string|null $name
+     *   The machine name of a shunt to whose info to limit the return set.
+     *
+     * @return string
+     *   A pretty-printed, JSON-encoded array of shunt info.
+     *
+     * @throws \InvalidArgumentException
+     *   Throws an exception if an invalid shunt name is given.
      */
-    protected function resetShunts() {
-      $this->disableShunts($this->allShunts);
+    protected function shuntInfo($name = NULL) {
+      if (!is_null($name) && (!is_string($name) || !in_array($name, $this->allShunts))) {
+        throw new \InvalidArgumentException(sprintf('Invalid shunt name.'));
+      }
+
+      $info = array(
+        'shunt' => array(
+          'name' => 'shunt',
+          'provider' => 'shunt',
+          'description' => 'Default shunt. No built-in behavior.',
+          'status' => 'Enabled',
+        ),
+        'shuntexample' => array(
+          'name' => 'shuntexample',
+          'provider' => 'shuntexample',
+          'description' => 'Display a fail whale at /shuntexample.',
+          'status' => 'Disabled',
+        ),
+      );
+
+      // If a shunt name is provided, return only its subset of info,
+      // maintaining the same data structure depth.
+      if ($name) {
+        return json_encode(array($name => $info[$name]), JSON_PRETTY_PRINT);
+      }
+      // Otherwise return all info.
+      else {
+        return json_encode($info, JSON_PRETTY_PRINT);
+      }
     }
 
     /**
