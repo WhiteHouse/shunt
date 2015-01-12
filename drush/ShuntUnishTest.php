@@ -11,6 +11,8 @@ if (class_exists('Unish\CommandUnishTestCase')) {
 
   /**
    * Unish tests for the Shunt module.
+   *
+   * @todo Add tests for command argument autocompletion?
    */
   class ShuntUnishTest extends CommandUnishTestCase {
 
