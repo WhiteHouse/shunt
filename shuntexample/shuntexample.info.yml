@@ -1,7 +1,7 @@
-name: 'Shunt Example'
+name: Shunt Example
 type: module
-description: 'An example implementation of Shunt module.'
-package: 'Example modules'
+description: An example implementation of Shunt module.
+package: Example modules
 version: VERSION
 core: 8.x
 dependencies:

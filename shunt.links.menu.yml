@@ -1,5 +1,5 @@
 shunt.config:
   title: Shunts
-  description: 'Configure shunts to make site functionality fail gracefully.'
+  description: Configure shunts to make site functionality fail gracefully.
   route_name: shunt.config
   parent: system.admin_config_development

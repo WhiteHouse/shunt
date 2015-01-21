@@ -1,7 +1,7 @@
-name: 'Shunt'
+name: Shunt
 type: module
-description: 'An API and UI for defining and interacting with "shunts" that enable your site to fail gracefully under strain.'
-package: 'Performance and scalability'
+description: An API and UI for defining and interacting with "shunts" that enable your site to fail gracefully under strain.
+package: Performance and scalability
 version: VERSION
 core: 8.x
 configure: shunt.config

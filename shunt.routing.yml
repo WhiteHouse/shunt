@@ -1,7 +1,7 @@
 shunt.config:
-  path: '/admin/config/development/shunts'
+  path: /admin/config/development/shunts
   defaults:
     _title: Shunts
-    _form: '\Drupal\shunt\Form\ShuntConfigForm'
+    _form: \Drupal\shunt\Form\ShuntConfigForm
   requirements:
-    _permission: 'administer shunts'
+    _permission: administer shunts
