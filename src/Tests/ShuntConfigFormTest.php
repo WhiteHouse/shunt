@@ -2,80 +2,27 @@
 
 /**
  * @file
- * Contains \Drupal\shunt\Tests\ShuntUiTest.
+ * Contains \Drupal\shunt\Tests\ShuntConfigFormTest.
  */
 
 namespace Drupal\shunt\Tests;
 
-use Drupal\simpletest\WebTestBase;
-
 /**
- * Tests the Shunt web UI.
+ * Tests the Shunt config form.
  *
  * @group shunt
  */
-class ShuntUiTest extends WebTestBase {
+class ShuntConfigFormTest extends ShuntWebTestBase {
 
   const CONFIG_FORM_PATH = 'admin/config/development/shunts';
 
   /**
-   * {@inheritdoc}
+   * Tests the config form.
    */
-  public static $modules = array('shunt', 'shuntexample');
-
-  /**
-   * The shunt manager.
-   *
-   * @var \Drupal\shunt\ShuntManager
-   */
-  protected $shuntManager;
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setUp() {
-    parent::setUp();
-
-    $this->shuntManager = \Drupal::service('plugin.manager.shunt');
-
-    $privileged_user = $this->drupalCreateUser(array('administer shunts'));
-    $this->drupalLogin($privileged_user);
-  }
-
-  /**
-   * Asserts that a shunt has a given status.
-   *
-   * @param string $name
-   *   The shunt name.
-   * @param bool $status
-   *   The shunt status--TRUE for enabled or FALSE for disabled.
-   * @param string $message
-   *   (optional) A message to display with the assertion. Do not translate
-   *   messages: use format_string() to embed variables in the message text, not
-   *   t(). If left blank, a default message will be displayed.
-   */
-  protected function assertShuntStatus($name, $status, $message = '') {
-    $actual = $this->shuntManager->shuntIsEnabled($name);
-    $expected = (bool) $status;
-    $this->assertIdentical($actual, $expected, $message);
-  }
-
-  /**
-   * Tests config form access.
-   */
-  public function testConfigFormAccess() {
+  public function testConfigFormStatusChanges() {
     $this->drupalGet($this::CONFIG_FORM_PATH);
     $this->assertResponse(200, 'Granted access to config form to privileged user.');
 
-    $this->drupalLogout();
-    $this->drupalGet($this::CONFIG_FORM_PATH);
-    $this->assertResponse(403, 'Denied access to config form non-privileged user.');
-  }
-
-  /**
-   * Tests making shunt status changes through the config form.
-   */
-  public function testConfigFormStatusChanges() {
     $this->assertShuntStatus('shunt', FALSE, 'Shunt "shunt" was disabled by default.');
     $this->assertShuntStatus('shuntexample', FALSE, 'Shunt "shuntexample" was disabled by default.');
 
@@ -102,6 +49,10 @@ class ShuntUiTest extends WebTestBase {
     $this->assertNoText(t('Shunt "shunt" has been disabled.'), 'Did not display message for unchanged shunt');
     $this->assertShuntStatus('shuntexample', FALSE, 'Shunt "shuntexample" was disabled.');
     $this->assertText(t('Shunt "shuntexample" has been disabled.'), 'Displayed message for disabled shunt');
+
+    $this->drupalLogout();
+    $this->drupalGet($this::CONFIG_FORM_PATH);
+    $this->assertResponse(403, 'Denied access to config form to non-privileged user.');
   }
 
 }

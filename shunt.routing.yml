@@ -5,3 +5,12 @@ shunt.config:
     _form: \Drupal\shunt\Form\ShuntConfigForm
   requirements:
     _permission: administer shunts
+shunt.set_status:
+  path: /admin/config/development/shunts/{shunt}/{action}
+  defaults:
+    _title: Set Shunt Status
+    _form: \Drupal\shunt\Form\SetShuntStatusConfirmForm
+  requirements:
+    _permission: administer shunts
+    shunt: '[_a-zA-Z0-9]+'
+    action: (enable|disable)
