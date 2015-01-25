@@ -27,11 +27,6 @@ if [ $? -eq 1 ]; then
   exit 1
 fi
 
-# Run PHPUnit tests.
-echo "Running PHPUnit tests..."
-${DRUPAL_ROOT}/core/vendor/bin/phpunit --configuration="$DRUPAL_ROOT/core" "$SCRIPT_DIR/tests/src"
-echo
-
 # Run Unish tests.
 echo "Running Unish tests..."
 UNAME=`uname`
@@ -48,5 +43,5 @@ echo
 echo "Running Simpletest tests..."
 WEBSERVER_USER=${1:-"www-data"}
 URI=${2:-"http://d8.dev/"}
-sudo -u ${WEBSERVER_USER} php ${DRUPAL_ROOT}/core/scripts/run-tests.sh --url ${URI} shunt
+sudo -u ${WEBSERVER_USER} php ${DRUPAL_ROOT}/core/scripts/run-tests.sh --url ${URI} shunt,shuntexample
 echo

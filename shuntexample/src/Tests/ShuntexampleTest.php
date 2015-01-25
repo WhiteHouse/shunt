@@ -7,6 +7,7 @@
 
 namespace Drupal\shuntexample\Tests;
 
+use Drupal\shunt\Entity\Shunt;
 use Drupal\simpletest\WebTestBase;
 
 /**
@@ -14,9 +15,15 @@ use Drupal\simpletest\WebTestBase;
  */
 class ShuntexampleTest extends WebTestBase {
 
+  /**
+   * The Shunt Example page path.
+   */
   const PAGE_PATH = 'shuntexample';
 
-  const SHUNT_NAME = 'shuntexample';
+  /**
+   * The Shunt Example shunt ID.
+   */
+  const SHUNT_ID = 'shunt_example';
 
   /**
    * {@inheritdoc}
@@ -29,13 +36,6 @@ class ShuntexampleTest extends WebTestBase {
    * @var \Drupal\user\Entity\User
    */
   protected $privilegedUser;
-
-  /**
-   * The shunt manager.
-   *
-   * @var \Drupal\shunt\ShuntManager
-   */
-  protected $shuntManager;
 
   /**
    * {@inheritdoc}
@@ -53,9 +53,6 @@ class ShuntexampleTest extends WebTestBase {
    */
   public function setUp() {
     parent::setUp();
-
-    $this->shuntManager = \Drupal::service('plugin.manager.shunt');
-
     user_role_change_permissions(DRUPAL_ANONYMOUS_RID, array('access content' => TRUE));
   }
 
@@ -65,12 +62,12 @@ class ShuntexampleTest extends WebTestBase {
   public function testShuntExamplePage() {
     $this->drupalGet($this::PAGE_PATH);
     $this->assertTitle('Hello world! | Drupal', 'Displayed default page title.');
-    $this->assertText('Enable the "shuntexample" shunt to make this page fail gracefully.', 'Displayed default page content.');
+    $this->assertText('Enable the "shunt_example" shunt to make this page fail gracefully.', 'Displayed default page content.');
 
-    $this->shuntManager->enableShunt($this::SHUNT_NAME);
+    Shunt::load($this::SHUNT_ID)->enableShunt();
     $this->drupalGet($this::PAGE_PATH);
     $this->assertTitle('Fail whale! | Drupal', 'Changed page title based on shunt status.');
-    $this->assertText('Disable the "shuntexample" shunt to restore this page.', 'Changed page content based on shunt status.');
+    $this->assertText('Disable the "shunt_example" shunt to restore this page.', 'Changed page content based on shunt status.');
   }
 
 }

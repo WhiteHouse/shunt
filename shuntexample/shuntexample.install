@@ -10,5 +10,5 @@
  */
 function shuntexample_uninstall() {
   // Remove state.
-  Drupal::state()->delete('shunt.shuntexample');
+  Drupal::state()->delete('shunt.shunt_example');
 }

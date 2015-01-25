@@ -1,4 +1,0 @@
-services:
-  plugin.manager.shunt:
-    class: Drupal\shunt\ShuntManager
-    arguments: ['@module_handler', '@cache.discovery', '@state']

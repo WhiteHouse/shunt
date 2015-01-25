@@ -10,6 +10,7 @@ namespace Drupal\shunt\Form;
 use Drupal\Core\Form\ConfirmFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
+use Drupal\shunt\Entity\Shunt;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -18,25 +19,11 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class SetShuntStatusConfirmForm extends ConfirmFormBase {
 
   /**
-   * The shunt manager.
+   * The given shunt.
    *
-   * @var \Drupal\shunt\ShuntManager
+   * @var \Drupal\shunt\Entity\Shunt
    */
-  public $shuntManager;
-
-  /**
-   * The given shunt machine name.
-   *
-   * @var string
-   */
-  public $shuntName;
-
-  /**
-   * The plugin definition for the given shunt.
-   *
-   * @var array
-   */
-  public $shuntDefinition;
+  public $shunt;
 
   /**
    * The status action--"enable" or "disable".
@@ -56,12 +43,12 @@ class SetShuntStatusConfirmForm extends ConfirmFormBase {
    * {@inheritdoc}
    */
   public function getQuestion() {
-    $args = array('@name' => $this->shuntName);
+    $args = array('%id' => $this->shunt->id());
     if ($this->action == 'enable') {
-      $message = t('Are you sure you want to enable the "@name" shunt?', $args);
+      $message = t('Are you sure you want to enable the %id shunt?', $args);
     }
     else {
-      $message = t('Are you sure you want to disable the "@name" shunt?', $args);
+      $message = t('Are you sure you want to disable the %id shunt?', $args);
     }
     return $message;
   }
@@ -70,7 +57,7 @@ class SetShuntStatusConfirmForm extends ConfirmFormBase {
    * {@inheritdoc}
    */
   public function getDescription() {
-    return $this->shuntDefinition['description'];
+    return $this->shunt->getDescription();
   }
 
   /**
@@ -96,22 +83,21 @@ class SetShuntStatusConfirmForm extends ConfirmFormBase {
    * {@inheritdoc}
    */
   public function getCancelUrl() {
-    return new Url('shunt.config');
+    return new Url('shunt.list');
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, $shunt = '', $action = '') {
-    $this->shuntManager = \Drupal::service('plugin.manager.shunt');
+  public function buildForm(array $form, FormStateInterface $form_state, $id = '', $action = '') {
+    $shunt = Shunt::load($id);
 
-    // Err if given shunt name is invalid.
-    if (!$this->shuntManager->shuntExists($shunt)) {
+    // Err if there is no such shunt.
+    if (!$shunt) {
       throw new NotFoundHttpException();
     }
 
-    $this->shuntName = $shunt;
-    $this->shuntDefinition = $this->shuntManager->getDefinition($shunt);
+    $this->shunt = $shunt;
     $this->action = $action;
 
     return parent::buildForm($form, $form_state);
@@ -121,30 +107,13 @@ class SetShuntStatusConfirmForm extends ConfirmFormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $form_state->setRedirect('shunt.config');
+    $form_state->setRedirect('shunt.list');
 
-    $current_state = $this->shuntManager->shuntIsEnabled($this->shuntName);
-    $target_state = ($this->action == 'enable');
-
-    // Abort if the the shunt is already in the target state.
-    if ($current_state == $target_state) {
-      $args = array('@name' => $this->shuntName);
-      if ($this->action == 'enable') {
-        $message = t('Shunt "@name" is already enabled.', $args);
-      }
-      else {
-        $message = t('Shunt "@name" is already disabled.', $args);
-      }
-      drupal_set_message($message, 'warning');
-      return;
-    }
-
-    // Set shunt status.
-    if ($target_state) {
-      $this->shuntManager->enableShunt($this->shuntName);
+    if ($this->action == 'enable') {
+      $this->shunt->enableShunt();
     }
     else {
-      $this->shuntManager->disableShunt($this->shuntName);
+      $this->shunt->disableShunt();
     }
   }
 }

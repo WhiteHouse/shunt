@@ -1,0 +1,5 @@
+shunt.add:
+  route_name: shunt.add
+  title: Add shunt
+  appears_on:
+    - shunt.list

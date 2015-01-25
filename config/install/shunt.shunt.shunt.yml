@@ -1,0 +1,7 @@
+uuid: 8fef382a-a967-4557-8357-87259ab93402
+langcode: en
+status: true
+dependencies: {  }
+id: shunt
+label: Shunt
+description: 'Default shunt. No built-in behavior.'

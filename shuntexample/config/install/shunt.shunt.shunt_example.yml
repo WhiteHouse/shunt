@@ -1,0 +1,7 @@
+uuid: ba4a0513-cf14-4a47-b650-80ac367f03cd
+langcode: en
+status: true
+dependencies: {  }
+id: shunt_example
+label: 'Shunt example'
+description: 'Display a fail whale at /shuntexample.'

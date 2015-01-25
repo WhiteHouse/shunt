@@ -1,16 +1,37 @@
-shunt.config:
+shunt.list:
   path: /admin/config/development/shunts
   defaults:
+    _entity_list: shunt
     _title: Shunts
-    _form: \Drupal\shunt\Form\ShuntConfigForm
+  requirements:
+    _permission: administer shunts
+shunt.add:
+  path: /admin/config/development/shunts/add
+  defaults:
+    _entity_form: shunt.add
+    _title: Add shunt
+  requirements:
+    _permission: administer shunts
+entity.shunt.edit_form:
+  path: /admin/config/development/shunts/{shunt}/edit
+  defaults:
+    _entity_form: shunt.edit
+    _title: Edit shunt
+  requirements:
+    _permission: administer shunts
+entity.shunt.delete_form:
+  path: /admin/config/development/shunts/{shunt}/delete
+  defaults:
+    _entity_form: shunt.delete
+    _title: Delete shunt
   requirements:
     _permission: administer shunts
 shunt.set_status:
-  path: /admin/config/development/shunts/{shunt}/{action}
+  path: /admin/config/development/shunts/{id}/{action}
   defaults:
     _title: Set Shunt Status
     _form: \Drupal\shunt\Form\SetShuntStatusConfirmForm
   requirements:
     _permission: administer shunts
-    shunt: '[_a-zA-Z0-9]+'
+    id: '[_a-z0-9]+'
     action: (enable|disable)

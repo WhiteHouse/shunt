@@ -4,4 +4,4 @@ description: An API and UI for defining and interacting with "shunts" that enabl
 package: Performance and scalability
 version: VERSION
 core: 8.x
-configure: shunt.config
+configure: shunt.list

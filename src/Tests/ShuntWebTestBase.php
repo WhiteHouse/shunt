@@ -7,6 +7,7 @@
 
 namespace Drupal\shunt\Tests;
 
+use Drupal\shunt\Entity\Shunt;
 use Drupal\simpletest\WebTestBase;
 
 /**
@@ -20,20 +21,10 @@ abstract class ShuntWebTestBase extends WebTestBase {
   public static $modules = array('shunt', 'shuntexample');
 
   /**
-   * The shunt manager.
-   *
-   * @var \Drupal\shunt\ShuntManager
-   */
-  protected $shuntManager;
-
-  /**
    * {@inheritdoc}
    */
   public function setUp() {
     parent::setUp();
-
-    $this->shuntManager = \Drupal::service('plugin.manager.shunt');
-
     $privileged_user = $this->drupalCreateUser(array('administer shunts'));
     $this->drupalLogin($privileged_user);
   }
@@ -41,8 +32,8 @@ abstract class ShuntWebTestBase extends WebTestBase {
   /**
    * Asserts that a shunt has a given status.
    *
-   * @param string $name
-   *   The shunt name.
+   * @param string $id
+   *   The shunt ID.
    * @param bool $status
    *   The shunt status--TRUE for enabled or FALSE for disabled.
    * @param string $message
@@ -50,8 +41,8 @@ abstract class ShuntWebTestBase extends WebTestBase {
    *   messages: use format_string() to embed variables in the message text, not
    *   t(). If left blank, a default message will be displayed.
    */
-  protected function assertShuntStatus($name, $status, $message = '') {
-    $actual = $this->shuntManager->shuntIsEnabled($name);
+  protected function assertShuntStatus($id, $status, $message = '') {
+    $actual = Shunt::load($id)->isShuntEnabled();
     $expected = (bool) $status;
     $this->assertIdentical($actual, $expected, $message);
   }

@@ -7,6 +7,8 @@
 
 namespace Drupal\shuntexample\Controller;
 
+use Drupal\shunt\Entity\Shunt;
+
 /**
  * Controller class for the Shunt Example module.
  */
@@ -22,7 +24,7 @@ class ShuntexampleController {
    * @see shuntexample-fail.html.twig
    */
   public function helloContent() {
-    // Fail cheap if the "shuntexample" shunt is enabled.
+    // Fail cheap if the "shunt_example" shunt is enabled.
     if ($this->isShuntTripped()) {
       return array('#theme' => 'shuntexample_fail');
     }
@@ -48,7 +50,14 @@ class ShuntexampleController {
    *   TRUE if the the shunt is tripped or FALSE if not.
    */
   protected function isShuntTripped() {
-    return \Drupal::moduleHandler()->moduleExists('shunt') && \Drupal::service('plugin.manager.shunt')->shuntIsEnabled('shuntexample');
+    // If your module doesn't declare a dependency on shunt in its .info.yml
+    // file, it needs to make sure the module is enabled before trying to load
+    // a shunt.
+    if (!\Drupal::moduleHandler()->moduleExists('shunt')) {
+      return FALSE;
+    }
+
+    return Shunt::load('shunt_example')->isShuntEnabled();
   }
 
 }
