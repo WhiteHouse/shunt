@@ -34,6 +34,7 @@ class ShuntListBuilder extends ConfigEntityListBuilder {
    * {@inheritdoc}
    */
   public function buildRow(EntityInterface $entity) {
+    /** @var \Drupal\shunt\Entity\Shunt $entity */
     $row['label'] = $this->getLabel($entity);
     $row['description'] = $this->getDescription($entity);
     $row['status'] = $this->getStatus($entity);
@@ -44,6 +45,7 @@ class ShuntListBuilder extends ConfigEntityListBuilder {
    * {@inheritdoc}
    */
   public function getDefaultOperations(EntityInterface $entity) {
+    /** @var \Drupal\shunt\Entity\Shunt $entity */
     $operations = parent::getDefaultOperations($entity);
 
     if ($entity->isShuntEnabled()) {
