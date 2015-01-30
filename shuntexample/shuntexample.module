@@ -6,23 +6,6 @@
  */
 
 /**
- * Implements hook_menu().
- */
-function shuntexample_menu() {
-  $items = array();
-
-  $items['shuntexample'] = array(
-    'title' => 'Shunt example',
-    'description' => 'An example page demonstrating graceful failure with Shunt module.',
-    'type' => MENU_NORMAL_ITEM,
-    'route_name' => 'shuntexample.hello',
-    'menu_name' => 'main',
-  );
-
-  return $items;
-}
-
-/**
  * Implements hook_theme().
  */
 function shuntexample_theme($existing, $type, $theme, $path) {

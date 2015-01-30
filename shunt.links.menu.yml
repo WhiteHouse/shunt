@@ -1,4 +1,4 @@
-shunt.config:
+shunt.list:
   title: Shunts
   description: Configure shunts to make site functionality fail gracefully.
   route_name: shunt.list
