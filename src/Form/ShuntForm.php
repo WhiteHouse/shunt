@@ -37,37 +37,37 @@ class ShuntForm extends EntityForm {
       $form['#title'] = String::checkPlain($this->t('Add shunt'));
     }
     else {
-      $form['#title'] = $this->t('Edit %id shunt', array(
+      $form['#title'] = $this->t('Edit %id shunt', [
         '%id' => $shunt->id(),
-      ));
+      ]);
     }
 
-    $form['label'] = array(
+    $form['label'] = [
       '#title' => t('Label'),
       '#type' => 'textfield',
       '#default_value' => $shunt->label(),
       '#description' => t('The human-readable label for this shunt.'),
       '#required' => TRUE,
       '#size' => 30,
-    );
+    ];
 
-    $form['id'] = array(
+    $form['id'] = [
       '#type' => 'machine_name',
       '#default_value' => $shunt->id(),
-      '#machine_name' => array(
-        'exists' => array($this, 'shuntExists'),
-        'source' => array('label'),
-      ),
+      '#machine_name' => [
+        'exists' => [$this, 'shuntExists'],
+        'source' => ['label'],
+      ],
       '#disabled' => !$shunt->isNew(),
-    );
+    ];
 
-    $form['description'] = array(
+    $form['description'] = [
       '#title' => t('Description'),
       '#type' => 'textarea',
       '#default_value' => $shunt->getDescription(),
       '#description' => t('Describe this shunt and the effect of enabling it.'),
       '#required' => TRUE,
-    );
+    ];
 
     return $form;
   }
@@ -79,7 +79,7 @@ class ShuntForm extends EntityForm {
     $shunt = $this->entity;
     $status = $shunt->save();
 
-    $args = array('%id' => $shunt->id());
+    $args = ['%id' => $shunt->id()];
     if ($status == SAVED_UPDATED) {
       drupal_set_message(t('Shunt %id has been updated.', $args));
     }

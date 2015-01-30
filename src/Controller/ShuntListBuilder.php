@@ -22,10 +22,10 @@ class ShuntListBuilder extends ConfigEntityListBuilder {
    */
   public function buildHeader() {
     $header['label'] = $this->t('Shunt');
-    $header['description'] = array(
+    $header['description'] = [
       'data' => $this->t('Description'),
-      'class' => array(RESPONSIVE_PRIORITY_MEDIUM),
-    );
+      'class' => [RESPONSIVE_PRIORITY_MEDIUM],
+    ];
     $header['status'] = $this->t('Status');
     return $header + parent::buildHeader();
   }
@@ -47,18 +47,18 @@ class ShuntListBuilder extends ConfigEntityListBuilder {
     $operations = parent::getDefaultOperations($entity);
 
     if ($entity->isShuntEnabled()) {
-      $operations['disable'] = array(
+      $operations['disable'] = [
         'title' => t('Disable'),
         'weight' => -10,
         'url' => $entity->urlInfo('disable'),
-      );
+      ];
     }
     else {
-      $operations['enable'] = array(
+      $operations['enable'] = [
         'title' => t('Enable'),
         'weight' => -10,
         'url' => $entity->urlInfo('enable'),
-      );
+      ];
     }
 
     return $operations;

@@ -43,7 +43,7 @@ class SetShuntStatusConfirmForm extends ConfirmFormBase {
    * {@inheritdoc}
    */
   public function getQuestion() {
-    $args = array('%id' => $this->shunt->id());
+    $args = ['%id' => $this->shunt->id()];
     if ($this->action == 'enable') {
       $message = t('Are you sure you want to enable the %id shunt?', $args);
     }

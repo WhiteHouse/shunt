@@ -28,7 +28,7 @@ class ShuntexampleTest extends WebTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = array('shunt', 'shuntexample');
+  public static $modules = ['shunt', 'shuntexample'];
 
   /**
    * A user object with permission to administer shunts.
@@ -41,11 +41,11 @@ class ShuntexampleTest extends WebTestBase {
    * {@inheritdoc}
    */
   public static function getInfo() {
-    return array(
+    return [
       'name' => 'Shunt Example',
       'description' => 'Tests the Shunt Example module.',
       'group' => 'Shunt',
-    );
+    ];
   }
 
   /**
@@ -53,7 +53,7 @@ class ShuntexampleTest extends WebTestBase {
    */
   public function setUp() {
     parent::setUp();
-    user_role_change_permissions(DRUPAL_ANONYMOUS_RID, array('access content' => TRUE));
+    user_role_change_permissions(DRUPAL_ANONYMOUS_RID, ['access content' => TRUE]);
   }
 
   /**

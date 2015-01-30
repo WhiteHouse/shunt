@@ -72,10 +72,10 @@ class Shunt extends ConfigEntityBase implements ShuntInterface {
     switch ($rel) {
       case 'enable':
       case 'disable':
-        return new Url('shunt.set_status', array(
+        return new Url('shunt.set_status', [
           'id' => $this->id(),
           'action' => $rel,
-        ));
+        ]);
 
       default:
         return parent::urlInfo($rel, $options);
@@ -100,14 +100,14 @@ class Shunt extends ConfigEntityBase implements ShuntInterface {
    * {@inheritdoc}
    */
   public function enableShunt() {
-    $t_args = array('%id' => $this->id());
+    $t_args = ['%id' => $this->id()];
 
     if ($this->isShuntEnabled()) {
       drupal_set_message(t('Shunt %id is already enabled.', $t_args), 'warning');
       return;
     }
 
-    \Drupal::moduleHandler()->invokeAll('shunt_status_change', array($this, 'enable'));
+    \Drupal::moduleHandler()->invokeAll('shunt_status_change', [$this, 'enable']);
 
     \Drupal::state()->set($this->getStatusStateKey(), TRUE);
 
@@ -119,14 +119,14 @@ class Shunt extends ConfigEntityBase implements ShuntInterface {
    * {@inheritdoc}
    */
   public function disableShunt() {
-    $t_args = array('%id' => $this->id());
+    $t_args = ['%id' => $this->id()];
 
     if (!$this->isShuntEnabled()) {
       drupal_set_message(t('Shunt %id is already disabled.', $t_args), 'warning');
       return;
     }
 
-    \Drupal::moduleHandler()->invokeAll('shunt_status_change', array($this, 'disable'));
+    \Drupal::moduleHandler()->invokeAll('shunt_status_change', [$this, 'disable']);
 
     \Drupal::state()->set($this->getStatusStateKey(), FALSE);
 

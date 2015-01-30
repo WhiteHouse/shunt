@@ -9,91 +9,91 @@
  * Implements hook_drush_command().
  */
 function shunt_drush_command() {
-  $items = array();
+  $items = [];
 
-  $items['shunt-enable'] = array(
+  $items['shunt-enable'] = [
     'description' => 'Enable one or more shunts.',
-    'arguments' => array(
+    'arguments' => [
       'ids' => 'A list of shunt IDs. You can use a wildcard (*) at the end of IDs to show info for multiple matches.',
-    ),
-    'options' => array(
-      'all' => array(
+    ],
+    'options' => [
+      'all' => [
         'description' => dt('Enable all shunts. Supersedes the "shunts" argument.'),
-      ),
-    ),
-    'examples' => array(
+      ],
+    ],
+    'examples' => [
       'drush shunt-enable example' => 'Enable the "example" shunt.',
       'drush shunt-enable example\*' => 'Enable all shunts whose IDs begin with "example".',
       'drush shunt-enable --all' => 'Enable all shunts.',
-    ),
-    'aliases' => array('she'),
-  );
+    ],
+    'aliases' => ['she'],
+  ];
 
-  $items['shunt-disable'] = array(
+  $items['shunt-disable'] = [
     'description' => 'Disable one or more shunts.',
-    'arguments' => array(
+    'arguments' => [
       'ids' => 'A list of shunt IDs. You can use a wildcard (*) at the end of IDs to show info for multiple matches.',
-    ),
-    'options' => array(
-      'all' => array(
+    ],
+    'options' => [
+      'all' => [
         'description' => dt('Disable all shunts. Supersedes the "shunts" argument.'),
-      ),
-    ),
-    'examples' => array(
+      ],
+    ],
+    'examples' => [
       'drush shunt-disable example' => 'Disable the "example" shunt.',
       'drush shunt-disable example\*' => 'Disable all shunts whose IDs begin with "example".',
       'drush shunt-disable --all' => 'Disable all shunts.',
-    ),
-    'aliases' => array('shd'),
-  );
+    ],
+    'aliases' => ['shd'],
+  ];
 
-  $items['shunt-info'] = array(
+  $items['shunt-info'] = [
     'description' => 'Show detailed info for one or more shunts.',
-    'arguments' => array(
+    'arguments' => [
       'shunts' => 'A list of shunt IDs. You can use a wildcard (*) at the end of IDs to show info for multiple matches. If no argument is provided it will show info for all available shunts.',
-    ),
-    'examples' => array(
+    ],
+    'examples' => [
       'drush shunt-info example' => 'Show info for the "example" shunt.',
       'drush shunt-info example\*' => 'Show info for all shunts whose IDs begin with "example".',
       'drush shunt-info' => 'Show info for all shunts.',
-    ),
-    'aliases' => array('shi'),
-    'outputformat' => array(
+    ],
+    'aliases' => ['shi'],
+    'outputformat' => [
       'default' => 'key-value-list',
       'pipe-format' => 'json',
-      'field-labels' => array(
+      'field-labels' => [
         'id' => 'Shunt',
         'description' => 'Description',
         'status' => 'Status',
-      ),
+      ],
       'output-data-type' => 'format-table',
-    ),
-  );
+    ],
+  ];
 
-  $items['shunt-list'] = array(
+  $items['shunt-list'] = [
     'description' => 'Show a list of available shunts with their statuses.',
-    'options' => array(
-      'status' => array(
+    'options' => [
+      'status' => [
         'description' => 'Filter by shunt status. Choices: "enabled", "disabled".',
         'example-value' => 'enabled',
-      ),
-    ),
-    'examples' => array(
+      ],
+    ],
+    'examples' => [
       'drush shunt-list' => 'Show all shunts.',
       'drush shunt-list --status=enabled' => 'Show only enabled shunts.',
-    ),
-    'outputformat' => array(
+    ],
+    'outputformat' => [
       'default' => 'table',
       'pipe-format' => 'list',
-      'field-labels' => array(
+      'field-labels' => [
         'id' => 'Shunt',
         'description' => 'Description',
         'status' => 'Status',
-      ),
+      ],
       'output-data-type' => 'format-table',
-    ),
-    'aliases' => array('shl'),
-  );
+    ],
+    'aliases' => ['shl'],
+  ];
 
   return $items;
 }
@@ -111,9 +111,9 @@ function drush_shunt_disable() {
   // Discard shunts that are already disabled.
   foreach ($shunts as $id => $shunt) {
     if (!$shunt->isShuntEnabled()) {
-      drush_log(dt('Shunt @id is already disabled.', array(
+      drush_log(dt('Shunt @id is already disabled.', [
         '@id' => $id,
-      )), 'ok');
+      ]), 'ok');
       unset($shunts[$id]);
     }
   }
@@ -122,9 +122,9 @@ function drush_shunt_disable() {
   if (empty($shunts)) {
     return drush_log(dt('There were no shunts that could be disabled.'), 'ok');
   }
-  drush_print(dt('The following shunts will be disabled: @ids', array(
+  drush_print(dt('The following shunts will be disabled: @ids', [
     '@ids' => implode(', ', array_keys($shunts)),
-  )));
+  ]));
   if (!drush_confirm(dt('Do you want to continue?'))) {
     return drush_user_abort();
   }
@@ -157,9 +157,9 @@ function drush_shunt_enable() {
   // Discard shunts that are already enabled.
   foreach ($shunts as $id => $shunt) {
     if ($shunt->isShuntEnabled()) {
-      drush_log(dt('Shunt @id is already enabled.', array(
+      drush_log(dt('Shunt @id is already enabled.', [
         '@id' => $id,
-      )), 'ok');
+      ]), 'ok');
       unset($shunts[$id]);
     }
   }
@@ -168,9 +168,9 @@ function drush_shunt_enable() {
   if (empty($shunts)) {
     return drush_log(dt('There were no shunts that could be enabled.'), 'ok');
   }
-  drush_print(dt('The following shunts will be enabled: @ids', array(
+  drush_print(dt('The following shunts will be enabled: @ids', [
     '@ids' => implode(', ', array_keys($shunts)),
-  )));
+  ]));
   if (!drush_confirm(dt('Do you want to continue?'))) {
     return drush_user_abort();
   }
@@ -208,13 +208,13 @@ function drush_shunt_info() {
     $shunt_list = _shunt_drush_get_all_shunt_ids();
   }
 
-  $result = array();
+  $result = [];
   foreach ($shunt_list as $shunt) {
-    $result[$shunt] = array(
+    $result[$shunt] = [
       'id' => $shunt,
       'description' => $info[$shunt]['description'],
       'status' => ($info[$shunt]['is_enabled']) ? dt('Enabled') : dt('Disabled'),
-    );
+    ];
   }
   return $result;
 }
@@ -235,7 +235,7 @@ function shunt_shunt_info_complete() {
  */
 function drush_shunt_list() {
   // Prepare and validate "status" filter.
-  $all_statuses = array('enabled', 'disabled');
+  $all_statuses = ['enabled', 'disabled'];
   $status_filter = strtolower(drush_get_option('status'));
   if (!empty($status_filter)) {
     $status_filter = explode(',', $status_filter);
@@ -248,14 +248,14 @@ function drush_shunt_list() {
   }
   foreach ($status_filter as $status) {
     if (!in_array($status, $all_statuses)) {
-      return drush_set_error('SHUNT_INVALID_STATUS', dt('@status is not a valid shunt status.', array(
+      return drush_set_error('SHUNT_INVALID_STATUS', dt('@status is not a valid shunt status.', [
         '@status' => $status,
-      )));
+      ]));
     }
   }
 
   // Build result table.
-  $result = array();
+  $result = [];
   $info = _shunt_drush_get_info();
   foreach ($info as $id => $properties) {
     // Filter by status.
@@ -265,11 +265,11 @@ function drush_shunt_list() {
     }
 
     // Build row.
-    $result[$id] = array(
+    $result[$id] = [
       'id' => $id,
       'description' => $properties['description'],
       'status' => ($properties['is_enabled']) ? dt('Enabled') : dt('Disabled'),
-    );
+    ];
   }
 
   return $result;
@@ -312,13 +312,13 @@ function _shunt_drush_get_all_shunt_ids() {
  */
 function _shunt_drush_get_info() {
   $shunts = _shunt_drush_get_all_shunts();
-  $info = array();
+  $info = [];
   foreach ($shunts as $id => $shunt) {
-    $info[$id] = array(
+    $info[$id] = [
       'id' => $id,
       'description' => $shunt->getDescription(),
       'is_enabled' => $shunt->isShuntEnabled(),
-    );
+    ];
   }
   return $info;
 }
@@ -331,7 +331,7 @@ function _shunt_drush_get_info() {
  */
 function _shunt_drush_complete_shunts() {
   if (drush_bootstrap_max(DRUSH_BOOTSTRAP_DRUPAL_FULL)) {
-    return array('values' => _shunt_drush_get_all_shunt_ids());
+    return ['values' => _shunt_drush_get_all_shunt_ids()];
   }
 }
 
@@ -389,15 +389,15 @@ function _shunt_drush_parse_shunt_list(array $raw_args) {
   $unique_args = array_unique($args_array);
 
   // Discard non-existent shunts.
-  $shunt_list = array();
+  $shunt_list = [];
   foreach ($unique_args as $id) {
     if (in_array($id, $all_shunt_ids)) {
       $shunt_list[] = $id;
     }
     else {
-      drush_log(dt('No such shunt @id.', array(
+      drush_log(dt('No such shunt @id.', [
         '@id' => $id,
-      )), 'warning');
+      ]), 'warning');
     }
   }
 

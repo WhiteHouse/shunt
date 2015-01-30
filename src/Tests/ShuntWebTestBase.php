@@ -18,14 +18,14 @@ abstract class ShuntWebTestBase extends WebTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = array('shunt', 'shuntexample');
+  public static $modules = ['shunt', 'shuntexample'];
 
   /**
    * {@inheritdoc}
    */
   public function setUp() {
     parent::setUp();
-    $privileged_user = $this->drupalCreateUser(array('administer shunts'));
+    $privileged_user = $this->drupalCreateUser(['administer shunts']);
     $this->drupalLogin($privileged_user);
   }
 

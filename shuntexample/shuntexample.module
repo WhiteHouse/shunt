@@ -9,14 +9,14 @@
  * Implements hook_theme().
  */
 function shuntexample_theme($existing, $type, $theme, $path) {
-  return array(
-    'shuntexample_fail' => array(
+  return [
+    'shuntexample_fail' => [
       'render element' => 'content',
       'template' => 'shuntexample-fail',
-    ),
-    'shuntexample_hello' => array(
+    ],
+    'shuntexample_hello' => [
       'render element' => 'content',
       'template' => 'shuntexample-hello',
-    ),
-  );
+    ],
+  ];
 }

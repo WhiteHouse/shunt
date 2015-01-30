@@ -20,9 +20,9 @@ class ShuntDeleteForm extends EntityConfirmFormBase {
    * {@inheritdoc}
    */
   public function getQuestion() {
-    return $this->t('Are you sure you want to delete the shunt %id?', array(
+    return $this->t('Are you sure you want to delete the shunt %id?', [
       '%id' => $this->entity->id(),
-    ));
+    ]);
   }
 
   /**
@@ -44,7 +44,7 @@ class ShuntDeleteForm extends EntityConfirmFormBase {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $this->entity->delete();
-    $args = array('%id' => $this->entity->id());
+    $args = ['%id' => $this->entity->id()];
     drupal_set_message($this->t('Shunt %id has been deleted.', $args));
     $this->logger('shunt')->notice('Deleted shunt %id.', $args);
     $form_state->setRedirectUrl($this->getCancelUrl());

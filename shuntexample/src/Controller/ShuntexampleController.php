@@ -26,11 +26,11 @@ class ShuntexampleController {
   public function helloContent() {
     // Fail cheap if the "shunt_example" shunt is enabled.
     if ($this->isShuntTripped()) {
-      return array('#theme' => 'shuntexample_fail');
+      return ['#theme' => 'shuntexample_fail'];
     }
 
     // Expensive processing can be done down here.
-    return array('#theme' => 'shuntexample_hello');
+    return ['#theme' => 'shuntexample_hello'];
   }
 
   /**

@@ -35,9 +35,9 @@ function hook_shunt_status_change(\Drupal\shunt\Entity\Shunt $shunt, $action) {
 
   // React to ANY shunt's status being changed--whether it's defined in your
   // module or not.
-  drupal_set_message(t("You're changing the status of the %id shunt!", array(
+  drupal_set_message(t("You're changing the status of the %id shunt!", [
     '%id' => $shunt->id(),
-  )));
+  ]));
 }
 
 /**
