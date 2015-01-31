@@ -1,15 +1,45 @@
 #!/usr/bin/env sh
 
-# @file
-# Runs automated tests for the Shunt module.
+# NAME
+#     run-tests.sh - Runs automated tests for the Shunt module.
 #
-# Usage ./run-tests.sh [$WEBSERVER_USER] (defaults to "www-data") [$URI]
-#   (defaults to "http://d8.dev/")
-#   e.g., ./run-tests.sh
-#   or ./run-tests.sh apache http://example.com/
+# SYNOPSIS
+#     run-tests.sh [options]
 #
-# Note: You will be prompted for your sudo password to run as the webserver
-# user.
+# DESCRIPTION
+#     run-tests.sh runs all the Shunt module's automated tests. It requires
+#     Drush. See http://drush.org/ for installation instructions. Note: If
+#     running Simpletest tests, you will be prompted for your sudo password to
+#     run as the web server user.
+#
+# OPTIONS
+#     -l uri
+#         The URI to pass to Simpletest. Defaults to "http://d8.dev/".
+#
+#     -s
+#         Run Simpletest tests only.
+#
+#     -u
+#         Run Unish (Drush) tests only.
+#
+#     -w web_server_user
+#         The shell user the web server runs under. Defaults to "www-data".
+
+# Set option defaults.
+RUN_UNISH=1
+RUN_SIMPLETEST=1
+WEB_SERVER_USER="www-data"
+URI="http://d8.dev/"
+
+# Parse options.
+while getopts "l:suw:" OPT; do
+  case ${OPT} in
+    l) URI=$OPTARG;;
+    s) RUN_UNISH=0;;
+    u) RUN_SIMPLETEST=0;;
+    w) WEB_SERVER_USER=$OPTARG;;
+  esac
+done
 
 # Get the directory the current script is in.
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -27,21 +57,23 @@ if [ $? -eq 1 ]; then
   exit 1
 fi
 
-# Run Unish tests.
-echo "Running Unish tests..."
-UNAME=`uname`
-if [ ${UNAME} = "Linux" ]; then
-  DRUSH_PATH="`readlink -f $(which drush)`"
-elif [ ${UNAME} = "Darwin" ] || [ ${UNAME} = "FreeBSD" ]; then
-  DRUSH_PATH="`realpath $(which drush)`"
+if [ ${RUN_UNISH} = 1 ]; then
+  # Run Unish tests.
+  echo "Running Unish tests..."
+  UNAME=`uname`
+  if [ ${UNAME} = "Linux" ]; then
+    DRUSH_PATH="`readlink -f $(which drush)`"
+  elif [ ${UNAME} = "Darwin" ] || [ ${UNAME} = "FreeBSD" ]; then
+    DRUSH_PATH="`realpath $(which drush)`"
+  fi
+  DRUSH_DIR="`dirname -- "$DRUSH_PATH"`"
+  ${DRUPAL_ROOT}/core/vendor/bin/phpunit --configuration="$DRUSH_DIR/tests" "$SCRIPT_DIR/drush"
+  echo
 fi
-DRUSH_DIR="`dirname -- "$DRUSH_PATH"`"
-${DRUPAL_ROOT}/core/vendor/bin/phpunit --configuration="$DRUSH_DIR/tests" "$SCRIPT_DIR/drush"
-echo
 
-# Run Simpletest tests.
-echo "Running Simpletest tests..."
-WEBSERVER_USER=${1:-"www-data"}
-URI=${2:-"http://d8.dev/"}
-sudo -u ${WEBSERVER_USER} php ${DRUPAL_ROOT}/core/scripts/run-tests.sh --url ${URI} shunt,shuntexample
-echo
+if [ ${RUN_SIMPLETEST} = 1 ]; then
+  # Run Simpletest tests.
+  echo "Running Simpletest tests..."
+  sudo -u ${WEB_SERVER_USER} php ${DRUPAL_ROOT}/core/scripts/run-tests.sh --url ${URI} shunt,shuntexample
+  echo
+fi
