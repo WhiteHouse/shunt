@@ -16,17 +16,31 @@ use Drupal\simpletest\WebTestBase;
 abstract class ShuntWebTestBase extends WebTestBase {
 
   /**
+   * The path to the shunt configuration page.
+   */
+  const CONFIG_PAGE_PATH = 'admin/config/development/shunts';
+
+  /**
    * {@inheritdoc}
    */
-  public static $modules = ['shunt', 'shuntexample'];
+  public static $modules = ['shunt', 'shuntexample', 'help', 'block'];
 
   /**
    * {@inheritdoc}
    */
   public function setUp() {
     parent::setUp();
+
+    // Create privileged user.
     $privileged_user = $this->drupalCreateUser(['administer shunts']);
     $this->drupalLogin($privileged_user);
+
+    // Place help block.
+    $this->drupalPlaceBlock('help_block', [
+      'region' => 'help',
+      'id' => 'help',
+      'label' => '',
+    ]);
   }
 
   /**
