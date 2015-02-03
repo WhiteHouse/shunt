@@ -40,4 +40,9 @@ interface ShuntInterface extends ConfigEntityInterface {
    */
   public function disableShunt();
 
+  /**
+   * Deletes the shunt's state storage item.
+   */
+  public function deleteState();
+
 }

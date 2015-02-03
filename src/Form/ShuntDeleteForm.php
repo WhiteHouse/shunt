@@ -43,10 +43,10 @@ class ShuntDeleteForm extends EntityConfirmFormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
+    $t_args = ['%id' => $this->entity->id()];
     $this->entity->delete();
-    $args = ['%id' => $this->entity->id()];
-    drupal_set_message($this->t('Shunt %id has been deleted.', $args));
-    $this->logger('shunt')->notice('Deleted shunt %id.', $args);
+    drupal_set_message($this->t('Shunt %id has been deleted.', $t_args));
+    $this->logger('shunt')->notice('Deleted shunt %id.', $t_args);
     $form_state->setRedirectUrl($this->getCancelUrl());
   }
 

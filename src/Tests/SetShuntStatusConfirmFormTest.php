@@ -37,7 +37,7 @@ class SetShuntStatusConfirmFormTest extends ShuntWebTestBase {
     $this->assertFieldByXPath('//input[@id="edit-submit"]//@value', 'Enable', 'Correctly labeled submit button "Enable".');
     $cancel_link = $this->xpath('//div[@id=:id]/a[@href=:href][text()=:text]', [
       ':id' => 'edit-actions',
-      ':href' => '/admin/config/development/shunts/shunt/enable',
+      ':href' => "/{$base_path}/shunt/enable",
       ':text' => 'Cancel',
     ]);
     $this->assertTrue($cancel_link, 'Displayed "Cancel" link pointing to given destination argument.');
