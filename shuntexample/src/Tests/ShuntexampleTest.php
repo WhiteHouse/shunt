@@ -62,12 +62,12 @@ class ShuntexampleTest extends WebTestBase {
   public function testShuntExamplePage() {
     $this->drupalGet($this::PAGE_PATH);
     $this->assertTitle('Hello world! | Drupal', 'Displayed default page title.');
-    $this->assertText('Enable the "shunt_example" shunt to make this page fail gracefully.', 'Displayed default page content.');
+    $this->assertText('Trip the "shunt_example" shunt to make this page fail gracefully.', 'Displayed default page content.');
 
-    Shunt::load($this::SHUNT_ID)->enableShunt();
+    Shunt::load($this::SHUNT_ID)->trip();
     $this->drupalGet($this::PAGE_PATH);
     $this->assertTitle('Fail whale! | Drupal', 'Changed page title based on shunt status.');
-    $this->assertText('Disable the "shunt_example" shunt to restore this page.', 'Changed page content based on shunt status.');
+    $this->assertText('Reset the "shunt_example" shunt to restore this page.', 'Changed page content based on shunt status.');
   }
 
 }

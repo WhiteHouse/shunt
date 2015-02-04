@@ -34,4 +34,4 @@ shunt.set_status:
   requirements:
     _permission: administer shunts
     id: '[_a-z0-9]+'
-    action: (enable|disable)
+    action: (trip|reset)

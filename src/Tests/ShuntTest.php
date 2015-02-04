@@ -24,7 +24,7 @@ class ShuntTest extends ShuntWebTestBase {
     /** @var \Drupal\shunt\Entity\Shunt $shunt */
     $shunt = Shunt::load('shunt');
 
-    $shunt->enableShunt();
+    $shunt->trip();
 
     $shunt->delete();
     $this->assertNull($state->get('shunt.shunt'), "Shunt's state was deleted with it.");

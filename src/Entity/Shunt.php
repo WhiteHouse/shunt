@@ -82,8 +82,8 @@ class Shunt extends ConfigEntityBase implements ShuntInterface {
     }
 
     switch ($rel) {
-      case 'enable':
-      case 'disable':
+      case 'trip':
+      case 'reset':
         return new Url('shunt.set_status', [
           'id' => $this->id(),
           'action' => $rel,
@@ -104,46 +104,46 @@ class Shunt extends ConfigEntityBase implements ShuntInterface {
   /**
    * {@inheritdoc}
    */
-  public function isShuntEnabled() {
+  public function isTripped() {
     return \Drupal::state()->get($this->getStatusStateKey(), FALSE);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function enableShunt() {
+  public function trip() {
     $t_args = ['%id' => $this->id()];
 
-    if ($this->isShuntEnabled()) {
-      drupal_set_message(t('Shunt %id is already enabled.', $t_args), 'warning');
+    if ($this->isTripped()) {
+      drupal_set_message(t('Shunt %id is already tripped.', $t_args), 'warning');
       return;
     }
 
-    \Drupal::moduleHandler()->invokeAll('shunt_status_change', [$this, 'enable']);
+    \Drupal::moduleHandler()->invokeAll('shunt_status_change', [$this, 'trip']);
 
     \Drupal::state()->set($this->getStatusStateKey(), TRUE);
 
-    \Drupal::logger('shunt')->notice('Enabled shunt %id.', $t_args);
-    drupal_set_message(t('Shunt %id has been enabled.', $t_args));
+    \Drupal::logger('shunt')->notice('Tripped shunt %id.', $t_args);
+    drupal_set_message(t('Shunt %id has been tripped.', $t_args));
   }
 
   /**
    * {@inheritdoc}
    */
-  public function disableShunt() {
+  public function reset() {
     $t_args = ['%id' => $this->id()];
 
-    if (!$this->isShuntEnabled()) {
-      drupal_set_message(t('Shunt %id is already disabled.', $t_args), 'warning');
+    if (!$this->isTripped()) {
+      drupal_set_message(t('Shunt %id is not tripped.', $t_args), 'warning');
       return;
     }
 
-    \Drupal::moduleHandler()->invokeAll('shunt_status_change', [$this, 'disable']);
+    \Drupal::moduleHandler()->invokeAll('shunt_status_change', [$this, 'reset']);
 
     \Drupal::state()->set($this->getStatusStateKey(), FALSE);
 
-    \Drupal::logger('shunt')->notice('Disabled shunt %id.', $t_args);
-    drupal_set_message(t('Shunt %id has been disabled.', $t_args));
+    \Drupal::logger('shunt')->notice('Reset shunt %id.', $t_args);
+    drupal_set_message(t('Shunt %id has been reset.', $t_args));
   }
 
   /**

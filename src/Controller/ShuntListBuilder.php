@@ -48,18 +48,18 @@ class ShuntListBuilder extends ConfigEntityListBuilder {
     /** @var \Drupal\shunt\Entity\Shunt $entity */
     $operations = parent::getDefaultOperations($entity);
 
-    if ($entity->isShuntEnabled()) {
-      $operations['disable'] = [
-        'title' => t('Disable'),
+    if ($entity->isTripped()) {
+      $operations['reset'] = [
+        'title' => t('Reset'),
         'weight' => -10,
-        'url' => $entity->urlInfo('disable'),
+        'url' => $entity->urlInfo('reset'),
       ];
     }
     else {
-      $operations['enable'] = [
-        'title' => t('Enable'),
+      $operations['trip'] = [
+        'title' => t('Trip'),
         'weight' => -10,
-        'url' => $entity->urlInfo('enable'),
+        'url' => $entity->urlInfo('trip'),
       ];
     }
 
@@ -98,7 +98,7 @@ class ShuntListBuilder extends ConfigEntityListBuilder {
    *   The human-readable shunt status.
    */
   protected function getStatus(ShuntInterface $shunt) {
-    return ($shunt->isShuntEnabled()) ? t('Enabled') : t('Disabled');
+    return ($shunt->isTripped()) ? t('Tripped') : t('Not tripped');
   }
 
 }

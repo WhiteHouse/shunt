@@ -20,7 +20,7 @@ class ShuntListBuilderTest extends ShuntWebTestBase {
    * Tests the page.
    */
   public function testPage() {
-    Shunt::load('shunt')->enableShunt();
+    Shunt::load('shunt')->trip();
 
     $this->drupalGet(self::CONFIG_PAGE_PATH);
     $this->assertResponse(200, 'Granted access to the config page to privileged user.');
@@ -50,25 +50,25 @@ class ShuntListBuilderTest extends ShuntWebTestBase {
     ]);
     $this->assertTrue($shunt_details, 'Correctly displayed shunt details.');
 
-    $shunt_statuses = $this->xpath('//table/tbody[tr[1]/td[3]=:enabled and tr[2]/td[3]=:disabled]', [
-      ':enabled' => 'Enabled',
-      ':disabled' => 'Disabled',
+    $shunt_statuses = $this->xpath('//table/tbody[tr[1]/td[3]=:tripped and tr[2]/td[3]=:not]', [
+      ':tripped' => 'Tripped',
+      ':not' => 'Not tripped',
     ]);
     $this->assertTrue($shunt_statuses, 'Displayed correct shunt statuses.');
 
-    $disable_dropdown_button = $this->xpath('//table/tbody/tr[1]/td[last()]/div/div/ul[@class=:class]/li[a[@href=:href] and a=:text]', [
+    $reset_dropdown_button = $this->xpath('//table/tbody/tr[1]/td[last()]/div/div/ul[@class=:class]/li[a[@href=:href] and a=:text]', [
       ':class' => 'dropbutton',
-      ':href' => '/' . self::CONFIG_PAGE_PATH . '/shunt/disable',
-      ':text' => 'Disable',
+      ':href' => '/' . self::CONFIG_PAGE_PATH . '/shunt/reset',
+      ':text' => 'Reset',
     ]);
-    $this->assertTrue($disable_dropdown_button, 'Displayed "Disable" dropdown button on enabled shunt.');
+    $this->assertTrue($reset_dropdown_button, 'Displayed "Reset" dropdown button on tripped shunt.');
 
-    $enable_dropdown_button = $this->xpath('//table/tbody/tr[2]/td[last()]/div/div/ul[@class=:class]/li[a[@href=:href] and a=:text]', [
+    $trip_dropdown_button = $this->xpath('//table/tbody/tr[2]/td[last()]/div/div/ul[@class=:class]/li[a[@href=:href] and a=:text]', [
       ':class' => 'dropbutton',
-      ':href' => '/' . self::CONFIG_PAGE_PATH . '/shunt_example/enable',
-      ':text' => 'Enable',
+      ':href' => '/' . self::CONFIG_PAGE_PATH . '/shunt_example/trip',
+      ':text' => 'Trip',
     ]);
-    $this->assertTrue($enable_dropdown_button, 'Displayed "Enable" dropdown button on disabled shunt.');
+    $this->assertTrue($trip_dropdown_button, 'Displayed "Trip" dropdown button on not tripped shunt.');
 
     $edit_dropdown_button = $this->xpath('//table/tbody/tr[1]/td[last()]/div/div/ul[@class=:class]/li[a[@href=:href] and a=:text]', [
       ':class' => 'dropbutton',

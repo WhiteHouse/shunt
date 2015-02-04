@@ -13,6 +13,6 @@ use Drupal\Core\Routing\RouteMatchInterface;
 function shunt_help($route_name, RouteMatchInterface $route_match) {
   switch ($route_name) {
     case 'shunt.list':
-      return '<p>' . t('Enable (or "trip") shunts to cause the functionality that depends on them to fail gracefully.') . '</p>';
+      return '<p>' . t('Trip shunts to cause dependant functionality to fail gracefully. Reset them to restore normal functionality.') . '</p>';
   }
 }

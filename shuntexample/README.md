@@ -14,7 +14,7 @@ make site functionality depend on a shunt.
 It includes the "shunt_example" shunt and creates a "Shunt example" page at the
 path shuntexample. The content of the page is made dependent on the state of the
 shunt in `\Drupal\shunt\Controller\ShuntexampleController::hello()`. Visit the
-page and see it change as you variously enable and disable the shunt.
+page and see it change as you variously trip and reset the shunt.
 
 
 ## Installation

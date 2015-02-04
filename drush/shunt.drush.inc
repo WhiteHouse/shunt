@@ -11,40 +11,40 @@
 function shunt_drush_command() {
   $items = [];
 
-  $items['shunt-enable'] = [
-    'description' => 'Enable one or more shunts.',
+  $items['shunt-trip'] = [
+    'description' => 'Trip one or more shunts.',
     'arguments' => [
       'ids' => 'A list of shunt IDs. You can use a wildcard (*) at the end of IDs to show info for multiple matches.',
     ],
     'options' => [
       'all' => [
-        'description' => dt('Enable all shunts. Supersedes the "shunts" argument.'),
+        'description' => dt('Trip all shunts. Supersedes the "shunts" argument.'),
       ],
     ],
     'examples' => [
-      'drush shunt-enable example' => 'Enable the "example" shunt.',
-      'drush shunt-enable example\*' => 'Enable all shunts whose IDs begin with "example".',
-      'drush shunt-enable --all' => 'Enable all shunts.',
+      'drush shunt-trip example' => 'Trip the "example" shunt.',
+      'drush shunt-trip example\*' => 'Trip all shunts whose IDs begin with "example".',
+      'drush shunt-trip --all' => 'Trip all shunts.',
     ],
-    'aliases' => ['she'],
+    'aliases' => ['sht'],
   ];
 
-  $items['shunt-disable'] = [
-    'description' => 'Disable one or more shunts.',
+  $items['shunt-reset'] = [
+    'description' => 'Reset one or more shunts.',
     'arguments' => [
       'ids' => 'A list of shunt IDs. You can use a wildcard (*) at the end of IDs to show info for multiple matches.',
     ],
     'options' => [
       'all' => [
-        'description' => dt('Disable all shunts. Supersedes the "shunts" argument.'),
+        'description' => dt('Reset all shunts. Supersedes the "shunts" argument.'),
       ],
     ],
     'examples' => [
-      'drush shunt-disable example' => 'Disable the "example" shunt.',
-      'drush shunt-disable example\*' => 'Disable all shunts whose IDs begin with "example".',
-      'drush shunt-disable --all' => 'Disable all shunts.',
+      'drush shunt-reset example' => 'Reset the "example" shunt.',
+      'drush shunt-reset example\*' => 'Reset all shunts whose IDs begin with "example".',
+      'drush shunt-reset --all' => 'Reset all shunts.',
     ],
-    'aliases' => ['shd'],
+    'aliases' => ['shr'],
   ];
 
   $items['shunt-info'] = [
@@ -74,13 +74,13 @@ function shunt_drush_command() {
     'description' => 'Show a list of available shunts with their statuses.',
     'options' => [
       'status' => [
-        'description' => 'Filter by shunt status. Choices: "enabled", "disabled".',
-        'example-value' => 'enabled',
+        'description' => "Filter by shunt status. Choices: tripped and/or 'not tripped'.",
+        'example-value' => 'tripped',
       ],
     ],
     'examples' => [
       'drush shunt-list' => 'Show all shunts.',
-      'drush shunt-list --status=enabled' => 'Show only enabled shunts.',
+      'drush shunt-list --status=tripped' => 'Show only tripped shunts.',
     ],
     'outputformat' => [
       'default' => 'table',
@@ -103,35 +103,35 @@ function shunt_drush_command() {
  *
  * @see shunt_drush_command()
  */
-function drush_shunt_disable() {
+function drush_shunt_reset() {
   $ids = _shunt_drush_parse_shunt_list(func_get_args());
   /** @var \Drupal\shunt\Entity\Shunt[] $shunts */
   $shunts = entity_load_multiple('shunt', $ids);
 
-  // Discard shunts that are already disabled.
+  // Discard shunts that are not tripped.
   foreach ($shunts as $id => $shunt) {
-    if (!$shunt->isShuntEnabled()) {
-      drush_log(dt('Shunt @id is already disabled.', [
+    if (!$shunt->isTripped()) {
+      drush_log(dt('Shunt @id is not tripped.', [
         '@id' => $id,
       ]), 'ok');
       unset($shunts[$id]);
     }
   }
 
-  // Inform the user which shunts will finally be disabled.
+  // Inform the user which shunts will finally be reset.
   if (empty($shunts)) {
-    return drush_log(dt('There were no shunts that could be disabled.'), 'ok');
+    return drush_log(dt('There were no shunts that could be reset.'), 'ok');
   }
-  drush_print(dt('The following shunts will be disabled: @ids', [
+  drush_print(dt('The following shunts will be reset: @ids', [
     '@ids' => implode(', ', array_keys($shunts)),
   ]));
   if (!drush_confirm(dt('Do you want to continue?'))) {
     return drush_user_abort();
   }
 
-  // Disable shunts.
+  // Reset shunts.
   foreach ($shunts as $shunt) {
-    $shunt->disableShunt();
+    $shunt->reset();
   }
 }
 
@@ -140,7 +140,7 @@ function drush_shunt_disable() {
  *
  * @see shunt_drush_command()
  */
-function shunt_shunt_disable_complete() {
+function shunt_shunt_reset_complete() {
   return _shunt_drush_complete_shunts();
 }
 
@@ -149,35 +149,35 @@ function shunt_shunt_disable_complete() {
  *
  * @see shunt_drush_command()
  */
-function drush_shunt_enable() {
+function drush_shunt_trip() {
   $ids = _shunt_drush_parse_shunt_list(func_get_args());
   /** @var \Drupal\shunt\Entity\Shunt[] $shunts */
   $shunts = entity_load_multiple('shunt', $ids);
 
-  // Discard shunts that are already enabled.
+  // Discard shunts that are already tripped.
   foreach ($shunts as $id => $shunt) {
-    if ($shunt->isShuntEnabled()) {
-      drush_log(dt('Shunt @id is already enabled.', [
+    if ($shunt->isTripped()) {
+      drush_log(dt('Shunt @id is already tripped.', [
         '@id' => $id,
       ]), 'ok');
       unset($shunts[$id]);
     }
   }
 
-  // Inform the user which shunts will finally be disabled.
+  // Inform the user which shunts will finally be tripped.
   if (empty($shunts)) {
-    return drush_log(dt('There were no shunts that could be enabled.'), 'ok');
+    return drush_log(dt('There were no shunts that could be tripped.'), 'ok');
   }
-  drush_print(dt('The following shunts will be enabled: @ids', [
+  drush_print(dt('The following shunts will be tripped: @ids', [
     '@ids' => implode(', ', array_keys($shunts)),
   ]));
   if (!drush_confirm(dt('Do you want to continue?'))) {
     return drush_user_abort();
   }
 
-  // Enable shunts.
+  // Trip shunts.
   foreach ($shunts as $shunt) {
-    $shunt->enableShunt();
+    $shunt->trip();
   }
 }
 
@@ -186,7 +186,7 @@ function drush_shunt_enable() {
  *
  * @see shunt_drush_command()
  */
-function shunt_shunt_enable_complete() {
+function shunt_shunt_trip_complete() {
   return _shunt_drush_complete_shunts();
 }
 
@@ -213,7 +213,7 @@ function drush_shunt_info() {
     $result[$shunt] = [
       'id' => $shunt,
       'description' => $info[$shunt]['description'],
-      'status' => ($info[$shunt]['is_enabled']) ? dt('Enabled') : dt('Disabled'),
+      'status' => ($info[$shunt]['is_tripped']) ? dt('Tripped') : dt('Not tripped'),
     ];
   }
   return $result;
@@ -235,7 +235,7 @@ function shunt_shunt_info_complete() {
  */
 function drush_shunt_list() {
   // Prepare and validate "status" filter.
-  $all_statuses = ['enabled', 'disabled'];
+  $all_statuses = ['tripped', 'not tripped'];
   $status_filter = strtolower(drush_get_option('status'));
   if (!empty($status_filter)) {
     $status_filter = explode(',', $status_filter);
@@ -259,7 +259,7 @@ function drush_shunt_list() {
   $info = _shunt_drush_get_info();
   foreach ($info as $id => $properties) {
     // Filter by status.
-    $status = ($properties['is_enabled']) ? 'enabled' : 'disabled';
+    $status = ($properties['is_tripped']) ? 'tripped' : 'not tripped';
     if (!in_array($status, $status_filter)) {
       continue;
     }
@@ -268,7 +268,7 @@ function drush_shunt_list() {
     $result[$id] = [
       'id' => $id,
       'description' => $properties['description'],
-      'status' => ($properties['is_enabled']) ? dt('Enabled') : dt('Disabled'),
+      'status' => ($properties['is_tripped']) ? dt('Tripped') : dt('Not tripped'),
     ];
   }
 
@@ -317,7 +317,7 @@ function _shunt_drush_get_info() {
     $info[$id] = [
       'id' => $id,
       'description' => $shunt->getDescription(),
-      'is_enabled' => $shunt->isShuntEnabled(),
+      'is_tripped' => $shunt->isTripped(),
     ];
   }
   return $info;

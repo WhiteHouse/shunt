@@ -24,7 +24,7 @@ class ShuntexampleController {
    * @see shuntexample-fail.html.twig
    */
   public function helloContent() {
-    // Fail cheap if the "shunt_example" shunt is enabled.
+    // Fail cheap if the "shunt_example" shunt is tripped.
     if ($this->isShuntTripped()) {
       return ['#theme' => 'shuntexample_fail'];
     }
@@ -57,7 +57,7 @@ class ShuntexampleController {
       return FALSE;
     }
 
-    return Shunt::load('shunt_example')->isShuntEnabled();
+    return Shunt::load('shunt_example')->isTripped();
   }
 
 }

@@ -26,7 +26,7 @@ class SetShuntStatusConfirmForm extends ConfirmFormBase {
   public $shunt;
 
   /**
-   * The status action--"enable" or "disable".
+   * The status action--"trip" or "reset".
    *
    * @var string
    */
@@ -43,12 +43,12 @@ class SetShuntStatusConfirmForm extends ConfirmFormBase {
    * {@inheritdoc}
    */
   public function getQuestion() {
-    $args = ['%id' => $this->shunt->id()];
-    if ($this->action == 'enable') {
-      $message = t('Are you sure you want to enable the %id shunt?', $args);
+    $t_args = ['%id' => $this->shunt->id()];
+    if ($this->action == 'trip') {
+      $message = t('Are you sure you want to trip the %id shunt?', $t_args);
     }
     else {
-      $message = t('Are you sure you want to disable the %id shunt?', $args);
+      $message = t('Are you sure you want to reset the %id shunt?', $t_args);
     }
     return $message;
   }
@@ -64,11 +64,11 @@ class SetShuntStatusConfirmForm extends ConfirmFormBase {
    * {@inheritdoc}
    */
   public function getConfirmText() {
-    if ($this->action == 'enable') {
-      return t('Enable');
+    if ($this->action == 'trip') {
+      return t('Trip');
     }
     else {
-      return t('Disable');
+      return t('Reset');
     }
   }
 
@@ -109,11 +109,11 @@ class SetShuntStatusConfirmForm extends ConfirmFormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $form_state->setRedirect('shunt.list');
 
-    if ($this->action == 'enable') {
-      $this->shunt->enableShunt();
+    if ($this->action == 'trip') {
+      $this->shunt->trip();
     }
     else {
-      $this->shunt->disableShunt();
+      $this->shunt->reset();
     }
   }
 }

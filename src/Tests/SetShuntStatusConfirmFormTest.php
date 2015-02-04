@@ -20,66 +20,66 @@ class SetShuntStatusConfirmFormTest extends ShuntWebTestBase {
   public function testForm() {
     $base_path = self::CONFIG_PAGE_PATH;
 
-    $this->assertShuntStatus('shunt', FALSE, 'Shunt disabled by default.');
+    $this->assertShuntStatus('shunt', FALSE, 'Shunt not tripped by default.');
 
-    $this->drupalGet("{$base_path}/invalid/enable");
+    $this->drupalGet("{$base_path}/invalid/trip");
     $this->assertResponse(404, 'Erred when given invalid shunt ID.');
 
     $this->drupalGet("{$base_path}/shunt/invalid");
     $this->assertResponse(404, 'Erred when given invalid action.');
 
-    $this->drupalGet("{$base_path}/shunt/enable", [
-      'query' => ['destination' => "{$base_path}/shunt/enable"],
+    $this->drupalGet("{$base_path}/shunt/trip", [
+      'query' => ['destination' => "{$base_path}/shunt/trip"],
     ]);
-    $this->assertResponse(200, 'Granted access to enable form to privileged user.');
-    $this->assertTitle('Are you sure you want to enable the shunt shunt? | Drupal');
+    $this->assertResponse(200, 'Granted access to trip form to privileged user.');
+    $this->assertTitle('Are you sure you want to trip the shunt shunt? | Drupal');
     $this->assertText('Default shunt. No built-in behavior.', 'Displayed shunt description as confirmation text.');
-    $this->assertFieldByXPath('//input[@id="edit-submit"]//@value', 'Enable', 'Correctly labeled submit button "Enable".');
+    $this->assertFieldByXPath('//input[@id="edit-submit"]//@value', 'Trip', 'Correctly labeled submit button "Trip".');
     $cancel_link = $this->xpath('//div[@id=:id]/a[@href=:href][text()=:text]', [
       ':id' => 'edit-actions',
-      ':href' => "/{$base_path}/shunt/enable",
+      ':href' => "/{$base_path}/shunt/trip",
       ':text' => 'Cancel',
     ]);
     $this->assertTrue($cancel_link, 'Displayed "Cancel" link pointing to given destination argument.');
 
-    $this->drupalPostForm(NULL, [], t('Enable'));
-    $this->assertUrl("{$base_path}/shunt/enable", [], 'Redirected to given destination.');
-    $this->assertText('Shunt shunt has been enabled.', 'Displayed the "enabled" notice.');
+    $this->drupalPostForm(NULL, [], t('Trip'));
+    $this->assertUrl("{$base_path}/shunt/trip", [], 'Redirected to given destination.');
+    $this->assertText('Shunt shunt has been tripped.', 'Displayed the "tripped" notice.');
     $cancel_link = $this->xpath('//div[@id=:id]/a[@href=:href][text()=:text]', [
       ':id' => 'edit-actions',
       ':href' => "/{$base_path}",
       ':text' => 'Cancel',
     ]);
     $this->assertTrue($cancel_link, 'Displayed "Cancel" link pointing to config form.');
-    $this->assertShuntStatus('shunt', TRUE, 'Enabled shunt.');
+    $this->assertShuntStatus('shunt', TRUE, 'Tripped shunt.');
 
-    $this->drupalPostForm(NULL, [], t('Enable'));
+    $this->drupalPostForm(NULL, [], t('Trip'));
     $this->assertUrl($base_path, [], 'Redirected to config form.');
-    $this->assertText('Shunt shunt is already enabled.', 'Displayed "already enabled" warning.');
+    $this->assertText('Shunt shunt is already tripped.', 'Displayed "already tripped" warning.');
     $this->assertShuntStatus('shunt', TRUE, 'Did not change shunt status.');
 
-    $this->drupalGet("{$base_path}/shunt/disable", [
-      'query' => ['destination' => "{$base_path}/shunt/disable"],
+    $this->drupalGet("{$base_path}/shunt/reset", [
+      'query' => ['destination' => "{$base_path}/shunt/reset"],
     ]);
-    $this->assertResponse(200, 'Granted access to disable form to privileged user.');
-    $this->assertTitle('Are you sure you want to disable the shunt shunt? | Drupal');
-    $this->assertFieldByXPath('//input[@id="edit-submit"]//@value', 'Disable', 'Correctly labeled submit button "Disable".');
+    $this->assertResponse(200, 'Granted access to reset form to privileged user.');
+    $this->assertTitle('Are you sure you want to reset the shunt shunt? | Drupal');
+    $this->assertFieldByXPath('//input[@id="edit-submit"]//@value', 'Reset', 'Correctly labeled submit button "Reset".');
 
-    $this->drupalPostForm(NULL, [], t('Disable'));
-    $this->assertUrl("{$base_path}/shunt/disable", [], 'Redirected to given destination.');
-    $this->assertText('Shunt shunt has been disabled.', 'Displayed the "disabled" notice.');
-    $this->assertShuntStatus('shunt', FALSE, 'Disabled shunt.');
+    $this->drupalPostForm(NULL, [], t('Reset'));
+    $this->assertUrl("{$base_path}/shunt/reset", [], 'Redirected to given destination.');
+    $this->assertText('Shunt shunt has been reset.', 'Displayed the "reset" notice.');
+    $this->assertShuntStatus('shunt', FALSE, 'Reset shunt.');
 
-    $this->drupalPostForm(NULL, [], t('Disable'));
-    $this->assertText('Shunt shunt is already disabled.', 'Displayed "already disabled" warning.');
+    $this->drupalPostForm(NULL, [], t('Reset'));
+    $this->assertText('Shunt shunt is not tripped.', 'Displayed "not tripped" warning.');
     $this->assertUrl($base_path, [], 'Redirected to config form.');
     $this->assertShuntStatus('shunt', FALSE, 'Did not change shunt status.');
 
     $this->drupalLogout();
-    $this->drupalGet("{$base_path}/shunt/enable");
-    $this->assertResponse(403, 'Denied access to enable form to non-privileged user.');
-    $this->drupalGet("{$base_path}/shunt/disable");
-    $this->assertResponse(403, 'Denied access to disable form to non-privileged user.');
+    $this->drupalGet("{$base_path}/shunt/trip");
+    $this->assertResponse(403, 'Denied access to trip form to non-privileged user.');
+    $this->drupalGet("{$base_path}/shunt/reset");
+    $this->assertResponse(403, 'Denied access to reset form to non-privileged user.');
   }
 
 }

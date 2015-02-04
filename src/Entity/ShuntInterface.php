@@ -23,25 +23,25 @@ interface ShuntInterface extends ConfigEntityInterface {
   public function getDescription();
 
   /**
-   * Determines whether the shunt is enabled or not.
+   * Determines whether the shunt is tripped or not.
    *
    * @return bool
-   *   Returns TRUE if the shunt is enabled or FALSE if it is disabled.
+   *   Returns TRUE if the shunt is tripped or FALSE if not.
    */
-  public function isShuntEnabled();
+  public function isTripped();
 
   /**
-   * Enables the shunt.
+   * Trips the shunt.
    */
-  public function enableShunt();
+  public function trip();
 
   /**
-   * Disables the shunt.
+   * Resets the shunt.
    */
-  public function disableShunt();
+  public function reset();
 
   /**
-   * Deletes the shunt's state storage item.
+   * Deletes the shunt's stored state.
    */
   public function deleteState();
 

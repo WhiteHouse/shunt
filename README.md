@@ -18,8 +18,8 @@ Current maintainer: [whitehouse](https://www.drupal.org/u/whitehouse)
 > -- <cite>[Wikipedia](http://en.wikipedia.org/wiki/Shunt_(electrical))</cite>
 
 Shunt module provides a facility for developers to create virtual "shunts" that
-site administrators can enable (or "trip") in emergency situations, instructing
-Drupal to fail gracefully where functionality depends on them.
+site administrators can trip in emergency situations, instructing Drupal to fail
+gracefully where functionality depends on them.
 
 For example, you might create a shunt that disables certain expensive database
 operations so that in case of an overwhelming traffic event like a denial of
@@ -29,7 +29,7 @@ submissions.
 
 This is an API module. It doesn't do anything by itself. Rather, it provides
 module developers the ability to define shunts and make functionality dependant
-on them, and it gives site administrators the ability to enable and disable said
+on them, and it gives site administrators the ability to trip and reset said
 shunts via the web UI or Drush.
 
 
@@ -42,7 +42,7 @@ modules](https://www.drupal.org/documentation/install/modules-themes/modules-8).
 ## Usage
 
 Shunts can be administered via the web UI at admin/config/development/shunts and
-enabled and disabled there or via Drush. For a list of available Drush commands
+tripped and reset there or via Drush. For a list of available Drush commands
 execute the following:
 
 ```bash

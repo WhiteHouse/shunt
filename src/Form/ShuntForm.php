@@ -79,13 +79,13 @@ class ShuntForm extends EntityForm {
     $shunt = $this->entity;
     $status = $shunt->save();
 
-    $args = ['%id' => $shunt->id()];
+    $t_args = ['%id' => $shunt->id()];
     if ($status == SAVED_UPDATED) {
-      drupal_set_message(t('Shunt %id has been updated.', $args));
+      drupal_set_message(t('Shunt %id has been updated.', $t_args));
     }
     elseif ($status == SAVED_NEW) {
-      drupal_set_message(t('Shunt %id has been added.', $args));
-      $this->logger('shunt')->notice('Added shunt %id.', $args);
+      drupal_set_message(t('Shunt %id has been added.', $t_args));
+      $this->logger('shunt')->notice('Added shunt %id.', $t_args);
     }
 
     $form_state->setRedirect('shunt.list');

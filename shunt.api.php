@@ -13,23 +13,23 @@
 /**
  * Perform actions when a shunt status is being changed.
  *
- * This hook is fired immediately before a shunt is enabled or disabled.
+ * This hook is fired immediately before a shunt is tripped or reset.
  *
  * @param \Drupal\shunt\Entity\Shunt $shunt
  *   The ID of shunt that is being acted upon.
  * @param bool $action
- *   The action being performed: either "enable" or "disable".
+ *   The action being performed: either "trip" or "reset".
  */
 function hook_shunt_status_change(\Drupal\shunt\Entity\Shunt $shunt, $action) {
   // React to a particular shunt's status being changed.
   if ($shunt->id() == 'example') {
 
     // React differently based on action.
-    if ($action == 'enable') {
-      drupal_set_message(t("You're enabling the example shunt!"));
+    if ($action == 'trip') {
+      drupal_set_message(t("You're tripping the example shunt!"));
     }
     else {
-      drupal_set_message(t("You're disabling the example shunt!"));
+      drupal_set_message(t("You're resetting the example shunt!"));
     }
   }
 

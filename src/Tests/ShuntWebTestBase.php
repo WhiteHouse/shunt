@@ -49,14 +49,14 @@ abstract class ShuntWebTestBase extends WebTestBase {
    * @param string $id
    *   The shunt ID.
    * @param bool $status
-   *   The shunt status--TRUE for enabled or FALSE for disabled.
+   *   The shunt status--TRUE for tripped or FALSE for not.
    * @param string $message
    *   (optional) A message to display with the assertion. Do not translate
    *   messages: use format_string() to embed variables in the message text, not
    *   t(). If left blank, a default message will be displayed.
    */
   protected function assertShuntStatus($id, $status, $message = '') {
-    $actual = Shunt::load($id)->isShuntEnabled();
+    $actual = Shunt::load($id)->isTripped();
     $expected = (bool) $status;
     $this->assertIdentical($actual, $expected, $message);
   }
