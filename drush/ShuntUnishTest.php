@@ -168,25 +168,25 @@ if (class_exists('Unish\CommandUnishTestCase')) {
       $options = ['format' => 'json'];
 
       $this->drush('shunt-info', [], $options, $this->site);
-      $this->assertEquals($this->shuntInfo(), $this->getOutput(), 'Returned all info without "ids" argument.');
+      $this->assertEquals($this->infoOutput(), $this->getOutput(), 'Returned all info without "ids" argument.');
 
       $this->drush('shunt-info', ['invalid'], [], $this->site);
       $this->assertStringStartsWith('No such shunt invalid.', $this->getErrorOutput(), 'Warned about invalid "ids" argument.');
 
       $this->drush('shunt-info', ['shunt'], $options, $this->site);
-      $this->assertEquals($this->shuntInfo('shunt'), $this->getOutput(), 'Returned info for explicitly named shunt.');
+      $this->assertEquals($this->infoOutput('shunt'), $this->getOutput(), 'Returned info for explicitly named shunt.');
 
       $this->drush('shunt-info', $this->allShunts, $options, $this->site);
-      $this->assertEquals($this->shuntInfo(), $this->getOutput(), 'Returned info for multiple, explicitly named shunts.');
+      $this->assertEquals($this->infoOutput(), $this->getOutput(), 'Returned info for multiple, explicitly named shunts.');
 
       $this->drush('shunt-info', ['*'], $options, $this->site);
-      $this->assertEquals($this->shuntInfo(), $this->getOutput(), 'Correctly expanded bare asterisk "ids" argument.');
+      $this->assertEquals($this->infoOutput(), $this->getOutput(), 'Correctly expanded bare asterisk "ids" argument.');
 
       $this->drush('shunt-info', ['shunt*'], $options, $this->site);
-      $this->assertEquals($this->shuntInfo(), $this->getOutput(), 'Correctly expanded "ids" argument with trailing slash and multiple matches.');
+      $this->assertEquals($this->infoOutput(), $this->getOutput(), 'Correctly expanded "ids" argument with trailing slash and multiple matches.');
 
       $this->drush('shunt-info', ['shunt_ex*'], $options, $this->site);
-      $this->assertEquals($this->shuntInfo('shunt_example'), $this->getOutput(), 'Correctly expanded "ids" argument with trailing slash and single match.');
+      $this->assertEquals($this->infoOutput('shunt_example'), $this->getOutput(), 'Correctly expanded "ids" argument with trailing slash and single match.');
     }
 
     /**
@@ -198,16 +198,16 @@ if (class_exists('Unish\CommandUnishTestCase')) {
       $options = ['format' => 'json'];
 
       $this->drush('shunt-list', [], $options, $this->site);
-      $this->assertEquals($this->shuntInfo(), $this->getOutput(), 'Returned all info without "status" option.');
+      $this->assertEquals($this->listOutput(), $this->getOutput(), 'Returned all info without "status" option.');
 
       $this->drush('shunt-list', [], $options + ['status' => 'tripped'], $this->site);
-      $this->assertEquals($this->shuntInfo('shunt'), $this->getOutput(), 'Filtered info to tripped shunts.');
+      $this->assertEquals($this->listOutput('shunt'), $this->getOutput(), 'Filtered info to tripped shunts.');
 
       $this->drush('shunt-list', [], $options + ['status' => 'not tripped'], $this->site);
-      $this->assertEquals($this->shuntInfo('shunt_example'), $this->getOutput(), 'Filtered info to shunts that are not tripped.');
+      $this->assertEquals($this->listOutput('shunt_example'), $this->getOutput(), 'Filtered info to shunts that are not tripped.');
 
       $this->drush('shunt-list', [], $options + ['status' => 'tripped,not tripped'], $this->site);
-      $this->assertEquals($this->shuntInfo(), $this->getOutput(), 'Returned all info with both "status" option values given.');
+      $this->assertEquals($this->listOutput(), $this->getOutput(), 'Returned all info with both "status" option values given.');
 
       $this->drush('shunt-list', [], $options + ['status' => 'invalid'], $this->site, NULL, self::EXIT_ERROR);
       $this->assertStringStartsWith('invalid is not a valid shunt status.', $this->getErrorOutput(), 'Erred on invalid "status" option.');
@@ -262,43 +262,79 @@ if (class_exists('Unish\CommandUnishTestCase')) {
     }
 
     /**
-     * Returns a given subset of available shunt info, JSON-encoded.
+     * Returns the expected output of the shunt-info command, JSON-encoded.
      *
      * @param string|null $id
      *   The ID of a shunt to whose info to limit the return set.
      *
      * @return string
-     *   A pretty-printed, JSON-encoded array of shunt info.
-     *
-     * @throws \InvalidArgumentException
-     *   Throws an exception if an invalid shunt ID is given.
+     *   A pretty-printed, JSON-encoded array of expected command output.
      */
-    protected function shuntInfo($id = NULL) {
-      if (!is_null($id) && (!is_string($id) || !in_array($id, $this->allShunts))) {
-        throw new \InvalidArgumentException(sprintf('Invalid shunt ID.'));
-      }
-
+    protected function infoOutput($id = NULL) {
       $info = [
         'shunt' => [
           'id' => 'shunt',
+          'label' => 'Shunt',
           'description' => 'Default shunt. No built-in behavior.',
           'status' => 'Tripped',
         ],
         'shunt_example' => [
           'id' => 'shunt_example',
+          'label' => 'Shunt example',
           'description' => 'Display a fail whale at /shuntexample.',
           'status' => 'Not tripped',
         ],
       ];
 
-      // If a shunt ID is provided, return only its subset of info, maintaining
+      return $this->filterAndEncode($info, $id);
+    }
+
+    /**
+     * Returns the expected output of the shunt-list command, JSON-encoded.
+     *
+     * @param string|null $id
+     *   The ID of a shunt to whose info to limit the return set.
+     *
+     * @return string
+     *   A pretty-printed, JSON-encoded array of expected command output.
+     */
+    protected function listOutput($id = NULL) {
+      $info = [
+        'shunt' => [
+          'name' => 'Shunt (shunt)',
+          'description' => 'Default shunt. No built-in behavior.',
+          'status' => 'Tripped',
+        ],
+        'shunt_example' => [
+          'name' => 'Shunt example (shunt_example)',
+          'description' => 'Display a fail whale at /shuntexample.',
+          'status' => 'Not tripped',
+        ],
+      ];
+
+      return $this->filterAndEncode($info, $id);
+    }
+
+    /**
+     * Optionally filters an array of data and JSON encodes it.
+     *
+     * @param array $data
+     *   An associative array of data.
+     * @param string|null $key
+     *   The key of an element to limit the return set to.
+     *
+     * @return string
+     *   A pretty-printed, JSON-encoded array of shunt info.
+     */
+    protected function filterAndEncode(array $data, $key) {
+      // If a shunt ID is provided, return only its subset of data, maintaining
       // the same data structure depth.
-      if ($id) {
-        return json_encode([$id => $info[$id]], JSON_PRETTY_PRINT);
+      if ($key) {
+        return json_encode([$key => $data[$key]], JSON_PRETTY_PRINT);
       }
-      // Otherwise return all info.
+      // Otherwise return all data.
       else {
-        return json_encode($info, JSON_PRETTY_PRINT);
+        return json_encode($data, JSON_PRETTY_PRINT);
       }
     }
 

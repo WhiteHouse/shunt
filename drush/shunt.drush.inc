@@ -62,7 +62,8 @@ function shunt_drush_command() {
       'default' => 'key-value-list',
       'pipe-format' => 'json',
       'field-labels' => [
-        'id' => 'Shunt',
+        'id' => 'ID',
+        'label' => 'Label',
         'description' => 'Description',
         'status' => 'Status',
       ],
@@ -86,7 +87,7 @@ function shunt_drush_command() {
       'default' => 'table',
       'pipe-format' => 'list',
       'field-labels' => [
-        'id' => 'Shunt',
+        'name' => 'Name',
         'description' => 'Description',
         'status' => 'Status',
       ],
@@ -196,8 +197,6 @@ function shunt_shunt_trip_complete() {
  * @see shunt_drush_command()
  */
 function drush_shunt_info() {
-  $info = _shunt_drush_get_info();
-
   $args = func_get_args();
   // If a list of shunts is supplied, parse it.
   if (!empty($args)) {
@@ -208,12 +207,14 @@ function drush_shunt_info() {
     $shunt_list = _shunt_drush_get_all_shunt_ids();
   }
 
+  $shunts = _shunt_drush_get_all_shunts();
   $result = [];
-  foreach ($shunt_list as $shunt) {
-    $result[$shunt] = [
-      'id' => $shunt,
-      'description' => $info[$shunt]['description'],
-      'status' => ($info[$shunt]['is_tripped']) ? dt('Tripped') : dt('Not tripped'),
+  foreach ($shunt_list as $id) {
+    $result[$id] = [
+      'id' => $id,
+      'label' => $shunts[$id]->label(),
+      'description' => $shunts[$id]->getDescription(),
+      'status' => ($shunts[$id]->isTripped()) ? dt('Tripped') : dt('Not tripped'),
     ];
   }
   return $result;
@@ -256,19 +257,21 @@ function drush_shunt_list() {
 
   // Build result table.
   $result = [];
-  $info = _shunt_drush_get_info();
-  foreach ($info as $id => $properties) {
+  foreach (_shunt_drush_get_all_shunts() as $shunt) {
     // Filter by status.
-    $status = ($properties['is_tripped']) ? 'tripped' : 'not tripped';
+    $status = ($shunt->isTripped()) ? 'tripped' : 'not tripped';
     if (!in_array($status, $status_filter)) {
       continue;
     }
 
     // Build row.
-    $result[$id] = [
-      'id' => $id,
-      'description' => $properties['description'],
-      'status' => ($properties['is_tripped']) ? dt('Tripped') : dt('Not tripped'),
+    $result[$shunt->id()] = [
+      'name' => dt('!label (@id)', [
+        '!label' => $shunt->label(),
+        '@id' => $shunt->id(),
+      ]),
+      'description' => $shunt->getDescription(),
+      'status' => ($shunt->isTripped()) ? dt('Tripped') : dt('Not tripped'),
     ];
   }
 
@@ -301,26 +304,6 @@ function _shunt_drush_get_all_shunt_ids() {
     $all_shunt_ids = array_keys(\Drupal::entityQuery('shunt')->execute());
   }
   return $all_shunt_ids;
-}
-
-/**
- * Gets all available shunt info.
- *
- * @return array
- *   An associative array of shunt info whose keys are shunt IDs and whose
- *   values are an associative array of properties for the corresponding shunt.
- */
-function _shunt_drush_get_info() {
-  $shunts = _shunt_drush_get_all_shunts();
-  $info = [];
-  foreach ($shunts as $id => $shunt) {
-    $info[$id] = [
-      'id' => $id,
-      'description' => $shunt->getDescription(),
-      'is_tripped' => $shunt->isTripped(),
-    ];
-  }
-  return $info;
 }
 
 /**
