@@ -12,6 +12,8 @@ use Drupal\simpletest\WebTestBase;
 
 /**
  * Tests Shunt Example module.
+ *
+ * @group shuntexample
  */
 class ShuntexampleTest extends WebTestBase {
 
