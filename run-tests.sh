@@ -41,6 +41,12 @@ while getopts "l:suw:" OPT; do
   esac
 done
 
+# If Simpletest is selected to run, the script will need sudo access later on.
+# Force a password prompt up-front so the rest of the run can be hands-free.
+if [ ${RUN_SIMPLETEST} = 1 ]; then
+  sudo true
+fi
+
 # Get the directory the current script is in.
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
@@ -57,8 +63,8 @@ if [ $? -eq 1 ]; then
   exit 1
 fi
 
+# Run Unish tests.
 if [ ${RUN_UNISH} = 1 ]; then
-  # Run Unish tests.
   echo "Running Unish tests..."
   UNAME=`uname`
   if [ ${UNAME} = "Linux" ]; then
@@ -71,8 +77,8 @@ if [ ${RUN_UNISH} = 1 ]; then
   echo
 fi
 
+# Run Simpletest tests.
 if [ ${RUN_SIMPLETEST} = 1 ]; then
-  # Run Simpletest tests.
   echo "Running Simpletest tests..."
   sudo -u ${WEB_SERVER_USER} php ${DRUPAL_ROOT}/core/scripts/run-tests.sh --url ${URI} shunt,shuntexample
   echo
