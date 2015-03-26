@@ -7,7 +7,7 @@
 
 namespace Drupal\shunt\Form;
 
-use Drupal\Component\Utility\String;
+use Drupal\Component\Utility\SafeMarkup;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\shunt\Entity\Shunt;
@@ -34,7 +34,7 @@ class ShuntForm extends EntityForm {
 
     // Set title.
     if ($this->operation == 'add') {
-      $form['#title'] = String::checkPlain($this->t('Add shunt'));
+      $form['#title'] = SafeMarkup::checkPlain($this->t('Add shunt'));
     }
     else {
       $form['#title'] = $this->t('Edit %id shunt', [
