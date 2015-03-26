@@ -60,11 +60,10 @@ if (class_exists('Unish\CommandUnishTestCase')) {
       $this->drush('shunt-reset', ['invalid'], [], $this->site);
       $this->assertStringStartsWith('No such shunt invalid.', $this->getErrorOutput(), 'Warned about invalid "ids" argument.');
 
-      $this->drush('shunt-reset', ['shunt'], ['no' => NULL], $this->site);
+      $this->drush('shunt-reset', ['shunt'], ['no' => NULL], $this->site, NULL, self::UNISH_EXITCODE_USER_ABORT);
       $output = $this->getOutputAsList();
       $this->assertEquals('The following shunts will be reset: shunt', $output[0]);
       $this->assertEquals('Do you want to continue? (y/n): n', $output[1]);
-      $this->assertStringStartsWith('Aborting.', $this->getErrorOutput());
       $this->assertShuntIsTripped('shunt', 'Shunt was not reset with "no" option.');
 
       $this->drush('shunt-reset', ['shunt'], ['yes' => NULL], $this->site);
@@ -96,11 +95,11 @@ if (class_exists('Unish\CommandUnishTestCase')) {
 
       $this->tripShunts($this->allShunts);
 
-      $this->drush('shunt-reset', ['*'], ['no' => NULL], $this->site);
+      $this->drush('shunt-reset', ['*'], ['no' => NULL], $this->site, NULL, self::UNISH_EXITCODE_USER_ABORT);
       $this->assertStringStartsWith('The following shunts will be reset: shunt, shunt_example', $this->getOutput(), 'Correctly expanded bare asterisk "ids" argument.');
-      $this->drush('shunt-reset', ['shunt*'], ['no' => NULL], $this->site);
+      $this->drush('shunt-reset', ['shunt*'], ['no' => NULL], $this->site, NULL, self::UNISH_EXITCODE_USER_ABORT);
       $this->assertStringStartsWith('The following shunts will be reset: shunt, shunt_example', $this->getOutput(), 'Correctly expanded "ids" argument with trailing slash and multiple matches.');
-      $this->drush('shunt-reset', ['shunt_ex*'], ['no' => NULL], $this->site);
+      $this->drush('shunt-reset', ['shunt_ex*'], ['no' => NULL], $this->site, NULL, self::UNISH_EXITCODE_USER_ABORT);
       $this->assertStringStartsWith('The following shunts will be reset: shunt_example', $this->getOutput(), 'Correctly expanded "ids" argument with trailing slash and single match.');
     }
 
@@ -115,11 +114,10 @@ if (class_exists('Unish\CommandUnishTestCase')) {
       $this->drush('shunt-trip', ['invalid'], [], $this->site);
       $this->assertStringStartsWith('No such shunt invalid.', $this->getErrorOutput(), 'Warned about invalid "ids" argument.');
 
-      $this->drush('shunt-trip', ['shunt'], ['no' => NULL], $this->site);
+      $this->drush('shunt-trip', ['shunt'], ['no' => NULL], $this->site, NULL, self::UNISH_EXITCODE_USER_ABORT);
       $output = $this->getOutputAsList();
       $this->assertEquals('The following shunts will be tripped: shunt', $output[0]);
       $this->assertEquals('Do you want to continue? (y/n): n', $output[1]);
-      $this->assertStringStartsWith('Aborting.', $this->getErrorOutput());
       $this->assertShuntIsNotTripped('shunt', 'Shunt was not tripped with "no" option.');
 
       $this->drush('shunt-trip', ['shunt'], ['yes' => NULL], $this->site);
@@ -151,11 +149,11 @@ if (class_exists('Unish\CommandUnishTestCase')) {
 
       $this->resetShunts($this->allShunts);
 
-      $this->drush('shunt-trip', ['*'], ['no' => NULL], $this->site);
+      $this->drush('shunt-trip', ['*'], ['no' => NULL], $this->site, NULL, self::UNISH_EXITCODE_USER_ABORT);
       $this->assertStringStartsWith('The following shunts will be tripped: shunt, shunt_example', $this->getOutput(), 'Correctly expanded bare asterisk "ids" argument.');
-      $this->drush('shunt-trip', ['shunt*'], ['no' => NULL], $this->site);
+      $this->drush('shunt-trip', ['shunt*'], ['no' => NULL], $this->site, NULL, self::UNISH_EXITCODE_USER_ABORT);
       $this->assertStringStartsWith('The following shunts will be tripped: shunt, shunt_example', $this->getOutput(), 'Correctly expanded "ids" argument with trailing slash and multiple matches.');
-      $this->drush('shunt-trip', ['shunt_ex*'], ['no' => NULL], $this->site);
+      $this->drush('shunt-trip', ['shunt_ex*'], ['no' => NULL], $this->site, NULL, self::UNISH_EXITCODE_USER_ABORT);
       $this->assertStringStartsWith('The following shunts will be tripped: shunt_example', $this->getOutput(), 'Correctly expanded "ids" argument with trailing slash and single match.');
     }
 
