@@ -8,7 +8,6 @@
 namespace Drupal\shunt\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
-use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Url;
 
 /**
@@ -63,12 +62,9 @@ class Shunt extends ConfigEntityBase implements ShuntInterface {
   /**
    * {@inheritdoc}
    */
-  public static function postDelete(EntityStorageInterface $storage, array $entities) {
-    parent::postDelete($storage, $entities);
-    /** @var \Drupal\shunt\Entity\Shunt $shunt */
-    foreach ($entities as $shunt) {
-      $shunt->deleteState();
-    }
+  public function delete() {
+    parent::delete();
+    $this->deleteState();
   }
 
   /**
