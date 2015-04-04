@@ -1,0 +1,5 @@
+services:
+  shunt.access_checker:
+    class: Drupal\shunt\Access\ShuntAccessCheck
+    tags:
+      - { name: access_check, applies_to: _shunt_access_check }

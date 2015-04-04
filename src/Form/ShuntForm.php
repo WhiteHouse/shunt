@@ -27,6 +27,21 @@ class ShuntForm extends EntityForm {
   /**
    * {@inheritdoc}
    */
+  protected function actions(array $form, FormStateInterface $form_state) {
+    $actions = parent::actions($form, $form_state);
+
+    $shunt = $this->entity;
+
+    if ($shunt->isProtected()) {
+      unset($actions['delete']);
+    }
+
+    return $actions;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
 

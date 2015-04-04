@@ -26,6 +26,9 @@ entity.shunt.delete_form:
     _title: Delete shunt
   requirements:
     _permission: administer shunts
+    _shunt_access_check: 'TRUE'
+  options:
+    _access_mode: 'ALL'
 shunt.set_status:
   path: /admin/config/development/shunts/{id}/{action}
   defaults:

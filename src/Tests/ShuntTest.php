@@ -17,9 +17,9 @@ use Drupal\shunt\Entity\Shunt;
 class ShuntTest extends ShuntWebTestBase {
 
   /**
-   * Tests the form.
+   * Tests the entity.
    */
-  public function testForm() {
+  public function testEntity() {
     $state = \Drupal::state();
     /** @var \Drupal\shunt\Entity\Shunt $shunt */
     $shunt = Shunt::load('shunt');

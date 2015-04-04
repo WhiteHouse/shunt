@@ -5,3 +5,4 @@ dependencies: {  }
 id: shunt_example
 label: 'Shunt example'
 description: 'Display a fail whale at /shuntexample.'
+protected: true
