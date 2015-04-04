@@ -5,3 +5,4 @@ dependencies: {  }
 id: shunt
 label: Shunt
 description: 'Default shunt. No built-in behavior.'
+protected: false

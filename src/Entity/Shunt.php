@@ -32,7 +32,6 @@ use Drupal\Core\Url;
  *   },
  *   links = {
  *     "edit-form" = "/admin/config/development/shunts/{shunt}",
- *     "delete-form" = "/admin/config/development/shunts/{shunt}/delete",
  *   }
  * )
  */
@@ -60,6 +59,13 @@ class Shunt extends ConfigEntityBase implements ShuntInterface {
   public $description;
 
   /**
+   * The protected flag.
+   *
+   * @var boolean
+   */
+  public $protected;
+
+  /**
    * {@inheritdoc}
    */
   public function delete() {
@@ -78,6 +84,11 @@ class Shunt extends ConfigEntityBase implements ShuntInterface {
     }
 
     switch ($rel) {
+      case 'delete':
+        return new Url('entity.shunt.delete_form', [
+          'shunt' => $this->id(),
+        ]);
+
       case 'trip':
       case 'reset':
         return new Url('shunt.set_status', [
@@ -102,6 +113,13 @@ class Shunt extends ConfigEntityBase implements ShuntInterface {
    */
   public function isTripped() {
     return \Drupal::state()->get($this->getStatusStateKey(), FALSE);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isProtected() {
+    return $this->protected;
   }
 
   /**

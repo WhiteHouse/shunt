@@ -82,7 +82,14 @@ class ShuntListBuilderTest extends ShuntWebTestBase {
       ':href' => '/' . self::CONFIG_PAGE_PATH . '/shunt/delete',
       ':text' => 'Delete',
     ]);
-    $this->assertTrue($delete_dropdown_button, 'Displayed "Delete" dropdown button.');
+    $this->assertTrue($delete_dropdown_button, 'Displayed "Delete" dropdown button for unprotected shunt.');
+
+    $delete_dropdown_button = $this->xpath('//table/tbody/tr[2]/td[last()]/div/div/ul[@class=:class]/li[a[@href=:href] and a=:text]', [
+      ':class' => 'dropbutton',
+      ':href' => '/' . self::CONFIG_PAGE_PATH . '/shunt_example/delete',
+      ':text' => 'Delete',
+    ]);
+    $this->assertTrue(empty($delete_dropdown_button), 'Did not display "Delete" dropdown button for protected shunt.');
 
     $this->drupalLogout();
     $this->drupalGet(self::CONFIG_PAGE_PATH);
