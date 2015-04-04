@@ -11,6 +11,3 @@ shunt.shunt.*:
     description:
       type: string
       label: Description
-    protected:
-      type: boolean
-      label: Protected

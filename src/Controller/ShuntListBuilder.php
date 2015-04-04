@@ -51,21 +51,15 @@ class ShuntListBuilder extends ConfigEntityListBuilder {
     if ($entity->isTripped()) {
       $operations['reset'] = [
         'title' => t('Reset'),
+        'weight' => -10,
         'url' => $entity->urlInfo('reset'),
       ];
     }
     else {
       $operations['trip'] = [
         'title' => t('Trip'),
+        'weight' => -10,
         'url' => $entity->urlInfo('trip'),
-      ];
-    }
-
-    if (!$entity->isProtected()) {
-      $operations['delete'] = [
-        'title' => t('Delete'),
-        'weight' => 20,
-        'url' => $entity->urlInfo('delete'),
       ];
     }
 

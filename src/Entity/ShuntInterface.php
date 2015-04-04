@@ -23,16 +23,6 @@ interface ShuntInterface extends ConfigEntityInterface {
   public function getDescription();
 
   /**
-   * Determines whether the shunt is protected or not.
-   *
-   * A protected shunt cannot be deleted via the UI.
-   *
-   * @return bool
-   *   Returns TRUE if the shunt is protected or FALSE if not.
-   */
-  public function isProtected();
-
-  /**
    * Determines whether the shunt is tripped or not.
    *
    * @return bool
