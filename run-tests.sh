@@ -56,6 +56,9 @@ if ! command -v drush >/dev/null 2>&1; then
   exit 1
 fi
 
+# Get the directory Drush is installed in.
+DRUSH_DIR="$(dirname "$( drush status 'Drush script' --format=list )" )"
+
 # Get the Drupal root directory. Abort if none is found.
 DRUPAL_ROOT=$(drush dd 2>&1)
 if [ $? -eq 1 ]; then
@@ -66,14 +69,7 @@ fi
 # Run Unish tests.
 if [ ${RUN_UNISH} = 1 ]; then
   echo "Running Unish tests..."
-  UNAME=`uname`
-  if [ ${UNAME} = "Linux" ]; then
-    DRUSH_PATH="`readlink -f $(which drush)`"
-  elif [ ${UNAME} = "Darwin" ] || [ ${UNAME} = "FreeBSD" ]; then
-    DRUSH_PATH="`realpath $(which drush)`"
-  fi
-  DRUSH_DIR="`dirname -- "$DRUSH_PATH"`"
-  ${DRUPAL_ROOT}/core/vendor/bin/phpunit --configuration="$DRUSH_DIR/tests" "$SCRIPT_DIR/drush"
+  ${DRUPAL_ROOT}/core/vendor/bin/phpunit --configuration="${DRUSH_DIR}/tests" "${SCRIPT_DIR}/drush"
   echo
 fi
 
