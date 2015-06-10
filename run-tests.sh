@@ -76,6 +76,10 @@ fi
 # Run Simpletest tests.
 if [ ${RUN_SIMPLETEST} = 1 ]; then
   echo "Running Simpletest tests..."
-  sudo -u ${WEB_SERVER_USER} php ${DRUPAL_ROOT}/core/scripts/run-tests.sh --url ${URI} shunt,shuntexample
+  sudo -u ${WEB_SERVER_USER} php ${DRUPAL_ROOT}/core/scripts/run-tests.sh \
+    --url ${URI} \
+    --concurrency 5 \
+    --color \
+    shunt,shuntexample
   echo
 fi
