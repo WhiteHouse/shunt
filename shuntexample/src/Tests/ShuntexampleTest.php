@@ -67,6 +67,9 @@ class ShuntexampleTest extends WebTestBase {
     $this->assertText('Trip the "shunt_example" shunt to make this page fail gracefully.', 'Displayed default page content.');
 
     Shunt::load($this::SHUNT_ID)->trip();
+    // The following tests are finicky without a cache clear. They succeed via
+    // core/scripts/run-tests.sh but fail via the web UI.
+    drupal_flush_all_caches();
     $this->drupalGet($this::PAGE_PATH);
     $this->assertTitle('Fail whale! | Drupal', 'Changed page title based on shunt status.');
     $this->assertText('Reset the "shunt_example" shunt to restore this page.', 'Changed page content based on shunt status.');
